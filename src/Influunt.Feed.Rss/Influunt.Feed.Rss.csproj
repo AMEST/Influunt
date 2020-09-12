@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Klabukov Erik</Authors>
+    <Product>Influunt</Product>
+    <Description>Influunt - Simple Rss Agregator</Description>
+    <Copyright>Klabukov Erik</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

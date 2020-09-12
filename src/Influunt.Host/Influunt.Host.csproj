@@ -5,6 +5,10 @@
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <UserSecretsId>f7b6a3ab-5dd3-487c-8763-0c114addb57b</UserSecretsId>
+    <Authors>Klabukov Erik</Authors>
+    <Product>Influunt</Product>
+    <Description>Influunt - Simple Rss Agregator</Description>
+    <Copyright>Klabukov Erik</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
@@ -53,7 +57,7 @@
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
       <DistFiles Include="$(SpaRoot)dist\**" />
-      <ResolvedFileToPublish Include="@(DistFiles-&gt;'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
         <RelativePath>%(DistFiles.Identity)</RelativePath>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         <ExcludeFromSingleFile>True</ExcludeFromSingleFile>
