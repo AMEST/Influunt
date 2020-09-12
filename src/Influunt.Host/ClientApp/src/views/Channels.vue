@@ -1,0 +1,85 @@
+<template>
+  <div class="Channels pt-2" style="text-align:left">
+    <b-card class="light-gray-dark text-light mb-3" title="Add channel">
+      <b-row>
+        <b-col class="w-25" sm="3">
+          <label>Name:</label>
+        </b-col>
+        <b-col class="w-75" sm="9">
+          <b-form-input v-model="newChannelName"></b-form-input>
+        </b-col>
+      </b-row>
+      <b-row class="pt-2">
+        <b-col  class="w-25" sm="3">
+          <label>Url:</label>
+        </b-col>
+        <b-col class="w-75" sm="9">
+          <b-form-input v-model="newChannelUrl"></b-form-input>
+        </b-col>
+      </b-row>
+        <div align="right" class="mt-2"><b-button variant="outline-secondary" v-on:click="AddChannel">Add channel</b-button></div>
+    </b-card>
+    <b-list-group>
+      <ChannelItem v-for="(item, key) in this.channels" 
+        v-bind:key="key"
+        v-bind:name="item.name" 
+        v-bind:id="item.id" 
+        v-bind:url="item.url"
+        />
+    </b-list-group>
+  </div>
+</template>
+<script>
+import ChannelItem from "@/components/ChannelItem.vue"
+import InfluuntApi from "@/influunt"
+export default {
+  components:{
+    ChannelItem
+  },
+  data: function(){
+    return {
+      channels:[],
+      newChannelName:"",
+      newChannelUrl:""
+    }
+  },
+  methods:{
+    AddChannel: function(){
+      var self = this
+      InfluuntApi.AddChannel({
+        "name":self.newChannelName,
+        "url":self.newChannelUrl
+      },
+      function(r){
+        // eslint-disable-next-line
+        var rr = r
+        self.newChannelName = ""
+        self.newChannelUrl = ""
+        setTimeout(function(){
+          InfluuntApi.GetChannels(function(request){
+            self.channels = JSON.parse(request.response)
+            self.$forceUpdate()
+          })
+        },500)
+      })
+    }
+  },
+  mounted: function(){
+    var self = this
+    InfluuntApi.GetChannels(function(request){
+      self.channels = JSON.parse(request.response)
+    })
+  }
+}
+</script>
+<style scoped>
+    .light-gray-dark{
+        background-color: rgba(60, 67, 72) !important;
+    }
+
+    .form-control{
+        background-color: transparent;
+        color: #f8f9fa;
+        border-color: #dc3545;
+    }
+</style>

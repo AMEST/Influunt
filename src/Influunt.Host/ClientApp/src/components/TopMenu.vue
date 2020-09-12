@@ -1,0 +1,37 @@
+<template>
+    <div>
+        <b-navbar toggleable="lg" type="dark" variant="dark" class="shadow">
+            <b-container>
+                <b-navbar-brand href="#"><img class="topicon" src="../assets/rss.png"/>Influunt</b-navbar-brand>
+                <!-- Right aligned nav items -->
+                <b-navbar-nav class="ml-auto">
+                    <b-nav-item-dropdown v-if="this.isAuth" right>
+                        <!-- Using 'button-content' slot -->
+                        <template v-slot:button-content>
+                            <em>{{email}}</em>
+                        </template>
+                        <b-dropdown-item href="/api/account/SignOut">Sign Out</b-dropdown-item>
+                    </b-nav-item-dropdown>
+                </b-navbar-nav>
+            </b-container>
+        </b-navbar>
+    </div>
+</template>
+
+<script>
+export default {
+  name: 'TopMenu',
+  props:{
+      isAuth: Boolean,
+      email: String
+  }
+}
+</script>
+
+<style>
+    .topicon{
+        padding-bottom: 5px;
+        padding-right: 5px;
+        max-width: 32px;
+    }
+</style>
