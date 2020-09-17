@@ -1,6 +1,13 @@
 <template>
   <div class="home pt-5 enable-scroll" id="feed">
     <div>Filter by channel: <b-form-select v-model="selectedChannelFilter" :options="Array.from(channels, x => x.name)" class="bg-dark text-light" style="width: 220px"></b-form-select></div>
+    <b-row v-if="this.feed.length == 0" class="h-max align-items-center">
+      <b-col class="text-center">
+        <b-icon icon="rss" variant="warning" font-scale="7.5"/>
+        <br>
+        <span class="text-muted">News feed empty :(</span>
+      </b-col>
+    </b-row>
     <div v-for="(item, key) in this.feed" v-bind:key="key">
       <FeedItem v-bind:title="item.title" v-bind:description="item.description" v-bind:date="item.date" v-bind:link="item.link" v-bind:channel="item.channelName"/>
     </div>
@@ -103,5 +110,8 @@ export default {
       margin-top: 5px;
       max-height: calc(100vh - 63.8px);
       text-align: left;
+    }
+    .h-max{
+      height: calc(100vh - 170px);
     }
 </style>

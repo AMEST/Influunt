@@ -48,7 +48,33 @@ var InfluuntApi = {
             callback(request)
         }
         request.send()
+    },
+    AddFavorite: function(data, callback = (request) => { }, async = true){
+        var request = new XMLHttpRequest()
+        request.open("POST", "/api/favorite", async)
+        request.setRequestHeader("Content-Type","application/json")
+        request.onload = function () {
+            callback(request)
+        }
+        request.send(JSON.stringify(data))
+    },
+    GetFavorite: function(callback = (request) => { }, async = true){
+        var request = new XMLHttpRequest()
+        request.open("GET", "/api/favorite", async)
+        request.onload = function () {
+            callback(request)
+        }
+        request.send()
+    },
+    RemoveFavorite: function(id, callback = (request) => { }, async = true){
+        var request = new XMLHttpRequest()
+        request.open("DELETE", "/api/favorite/"+id, async)
+        request.onload = function () {
+            callback(request)
+        }
+        request.send()
     }
+        
 }
 export default InfluuntApi
 /* eslint-enable */

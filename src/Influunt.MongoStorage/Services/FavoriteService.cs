@@ -27,19 +27,20 @@ namespace Influunt.MongoStorage.Services
                 Link = favorite.Link,
                 Title = favorite.Title,
                 UserId = user.Id,
+                ChannelName = favorite.ChannelName,
                 Id = ObjectId.GenerateNewId().ToString()
             };
             await _favoriteRepository.Create(favoriteItem);
             return favoriteItem;
         }
 
-        public Task Remove(User user, FavoriteFeedItem favorite)
+        public async Task Remove(User user, string id)
         {
-            if(!favorite.UserId.Equals(user.Id,StringComparison.OrdinalIgnoreCase))
-                return Task.CompletedTask;
+            var favorite = await _favoriteRepository.Get(id);
+            if(favorite == null || !favorite.UserId.Equals(user.Id,StringComparison.OrdinalIgnoreCase))
+                return;
             
             _favoriteRepository.Delete(favorite.Id);
-            return Task.CompletedTask;
         }
 
         public async Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user)

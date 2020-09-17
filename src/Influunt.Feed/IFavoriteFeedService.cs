@@ -21,9 +21,9 @@ namespace Influunt.Feed
         /// Удаление поста из избранного
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="favorite"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
-        Task Remove(User user, FavoriteFeedItem favorite);
+        Task Remove(User user, string id);
 
         /// <summary>
         /// Получение избранных постов пользователя

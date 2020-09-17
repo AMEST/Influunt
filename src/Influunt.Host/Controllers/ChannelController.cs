@@ -67,7 +67,7 @@ namespace Influunt.Host.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async void Delete(string id)
+        public async Task Delete(string id)
         {
             var user = await _userService.GetCurrentUser();
             var channel = await _channelService.Get(id);

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace Influunt.Feed.Rss
 {
@@ -13,12 +14,14 @@ namespace Influunt.Feed.Rss
     {
         private readonly IChannelService _channelService;
         private readonly IMemoryCache _memoryCache;
+        private readonly ILogger<RssFeedService> _logger;
         private HttpClient _rssClient;
 
-        public RssFeedService(IChannelService channelService, IMemoryCache memoryCache)
+        public RssFeedService(IChannelService channelService, IMemoryCache memoryCache, ILogger<RssFeedService> logger)
         {
             _channelService = channelService;
             _memoryCache = memoryCache;
+            _logger = logger;
             _rssClient = new HttpClient();
         }
 
@@ -50,7 +53,8 @@ namespace Influunt.Feed.Rss
             {
                 var remainingElements = feed.Count - offset.Value;
                 if (remainingElements < count)
-                    return feed.GetRange(offset.Value <= feed.Count? offset.Value: feed.Count, remainingElements < 0 ? 0 : remainingElements);
+                    return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
+                        remainingElements < 0 ? 0 : remainingElements);
 
                 return feed.GetRange(offset.Value, count);
             }
@@ -58,7 +62,8 @@ namespace Influunt.Feed.Rss
             return feed;
         }
 
-        public async Task<IEnumerable<FeedItem>> GetFeed(User user, FeedChannel channel, int? offset = null, int count = 10)
+        public async Task<IEnumerable<FeedItem>> GetFeed(User user, FeedChannel channel, int? offset = null,
+            int count = 10)
         {
             if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return new List<FeedItem>();
@@ -76,7 +81,8 @@ namespace Influunt.Feed.Rss
             {
                 var remainingElements = feed.Count - offset.Value;
                 if (remainingElements < count)
-                    return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count, remainingElements < 0 ? 0 : remainingElements);
+                    return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
+                        remainingElements < 0 ? 0 : remainingElements);
 
                 return feed.GetRange(offset.Value, count);
             }
@@ -86,22 +92,33 @@ namespace Influunt.Feed.Rss
 
         private async Task<List<FeedItem>> GetFeedFromChannel(FeedChannel channel)
         {
-            var result = await _rssClient.GetAsync(channel.Url);
-            var xmlRss = await result.Content.ReadAsStreamAsync();
-
-
-            XmlSerializer ser = new XmlSerializer(typeof(RssBody));
-            RssBody rssBody;
-            rssBody = (RssBody) ser.Deserialize(xmlRss);
-
-            return rssBody.Channel.Item.Select(rssItem => new FeedItem
+            try
             {
-                Title = rssItem.Title,
-                Description = rssItem.Description,
-                Date = rssItem.PubDate,
-                Link = rssItem.Link?.ToString(),
-                ChannelName = channel.Name
-            }).ToList();
+                var result = await _rssClient.GetAsync(channel.Url);
+
+                var xmlRss = await result.Content.ReadAsStreamAsync();
+
+
+                XmlSerializer ser = new XmlSerializer(typeof(RssBody));
+                RssBody rssBody;
+                rssBody = (RssBody) ser.Deserialize(xmlRss);
+
+                return rssBody.Channel.Item.Select(rssItem => new FeedItem
+                {
+                    Title = rssItem.Title,
+                    Description = rssItem.Description,
+                    Date = rssItem.PubDate,
+                    Link = rssItem.Link?.ToString(),
+                    ChannelName = channel.Name
+                }).ToList();
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(
+                    "Can not get rss feed from \nchannel: {channelName}\nurl: {channelUrl}\n with error: {message} ",
+                    channel.Name, channel.Url, e.Message);
+                return new List<FeedItem>();
+            }
         }
     }
 }
