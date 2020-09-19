@@ -3,7 +3,7 @@ COPY . /build
 WORKDIR /build
 RUN apt-get update -yq ;\
 	apt-get install curl gnupg -yq ;\
-	curl -sL https://deb.nodesource.com/setup_13.x | bash - ;\
+	curl -sL https://deb.nodesource.com/setup_14.x | bash - ;\
 	apt-get install -y nodejs
 	
 RUN dotnet restore -s https://api.nuget.org/v3/index.json; \
