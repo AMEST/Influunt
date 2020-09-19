@@ -40,7 +40,11 @@ namespace Influunt.Host
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
                     _ = options.Scope;
                 });
-            services.AddSpaStaticFiles(opt => opt.RootPath = "ClientApp/dist");
+            // In production, the Vue files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/dist";
+            });
             //AddModules
 
             var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<MongoStorageConfiguration>();
@@ -79,6 +83,11 @@ namespace Influunt.Host
                         forceKill: true
                     );
                 }
+            });
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
             });
         }
     }
