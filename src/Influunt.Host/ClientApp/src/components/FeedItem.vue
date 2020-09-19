@@ -45,6 +45,7 @@ export default {
         },
         RemoveFromFavorite: function(){
             var self = this
+            // eslint-disable-next-line
             InfluuntApi.RemoveFavorite(this.id, function(request){
                 self.deleted = true
             })

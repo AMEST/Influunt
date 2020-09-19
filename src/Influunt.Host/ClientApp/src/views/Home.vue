@@ -81,7 +81,8 @@ export default {
     var feed = document.getElementById("feed")
     feed.onscroll = function(){   
       var wh = window.innerHeight-58.6
-      if((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)){
+        if ((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)) {
+          // eslint-disable-next-line
           console.log("Download next 10 news. scrollTop:"+feed.scrollTop)
           self.scrollMax = feed.scrollHeight
           self.offset += 10
