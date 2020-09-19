@@ -1,5 +1,5 @@
 <template>
-  <div class="home pt-5 enable-scroll" id="feed">
+  <div class="favorite pt-5 enable-scroll" id="feed">
     <b-row v-if="this.feed.length == 0" class="h-max align-items-center">
       <b-col class="text-center">
         <b-icon icon="star-fill" variant="warning" font-scale="7.5"/>
@@ -45,5 +45,10 @@ name: 'favorite',
 <style scoped>
     .h-max{
       height: calc(100vh - 170px);
+    }
+    .favorite{
+      margin-top: 5px;
+      max-height: calc(100vh - 63.8px);
+      text-align: left;
     }
 </style>

@@ -104,9 +104,6 @@ export default {
 </script>
 
 <style scoped>
-    .enable-scroll{
-        overflow-y: auto !important;
-    }
     .home{
       margin-top: 5px;
       max-height: calc(100vh - 63.8px);

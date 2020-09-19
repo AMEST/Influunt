@@ -124,4 +124,27 @@ export default {
   .mw-75 {
     min-width: 75%!important;
   }
+  .enable-scroll{
+    overflow-y: auto !important;
+  }
+  /* Scroll */
+  /* width */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+      background: transparent; 
+    }
+ 
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+      background: #888; 
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555; 
+    }
 </style>
