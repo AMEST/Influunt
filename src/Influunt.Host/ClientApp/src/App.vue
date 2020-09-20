@@ -1,12 +1,12 @@
 <template>
-  <div id="app" class="bg-dark text-light">
+  <div id="app" class="bg-dark text-light" v-touch:swipe.right="swipeRight" v-touch:swipe.left="swipeLeft">
     <TopMenu v-bind:isAuth="this.isAuthenticated" v-bind:email="this.profile.email"/>
     <!--Main App-->
     <div v-if="this.isAuthenticated">
       <b-container fluid class="max-fluid-container-width">
         <b-row class="h-100vh">
 
-          <b-col class="inrow-menu w-25 pt-4 pr-0">
+          <b-col v-if="this.$store.state.application.isMenuOpened || !needMenuClosable" class="inrow-menu pt-4 pr-0" v-bind:class="[needMenuClosable ? 'ocmenu ocmenu-shadow bg-dark' : 'w-25']">
             <b-list-group>
               <b-list-group-item class="light-item">
                 <router-link class="pl-1" to="/">
@@ -52,7 +52,19 @@ export default {
   data: function(){
     return {
       isAuthenticated: false,
-      profile: {email:null}
+      profile: {email:null},
+      needMenuClosable: false
+    }
+  },
+  methods:{
+    resizeHandler: function(e){
+      this.needMenuClosable = (window.innerWidth <= 800)? true: false
+    },
+    swipeRight: function(){
+      this.$store.commit("changeMenuState", true);
+    },
+    swipeLeft: function(){
+      this.$store.commit("changeMenuState", false);
     }
   },
   created: function(){
@@ -64,66 +76,80 @@ export default {
         self.profile = currentProfile
       }
     }, false)
+    this.needMenuClosable = (window.innerWidth <= 800)? true: false
+    window.addEventListener("resize", this.resizeHandler);
   }
+ 
 }
 </script>
 
 <style>
-  #app {
-    font-family: Avenir,Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    overflow: hidden;
-  }
-  #nav {
-    padding: 30px;
-  }
+    #app {
+        font-family: Avenir,Helvetica,Arial,sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-align: center;
+        color: #2c3e50;
+        overflow: hidden;
+    }
+    #nav {
+        padding: 30px;
+    }
 
-  #nav a {
-    font-weight: bold;
-    color: #2c3e50;
-  }
+    #nav a {
+        font-weight: bold;
+        color: #2c3e50;
+    }
 
-  #nav a.router-link-exact-active {
-    color: #42b983;
-  }
-  code{
-    color: #e83e8c!important;
-  }
-  .inrow-menu .list-group .list-group-item{
-      border-radius: 5px 0 0 5px;
-      background-color: inherit;
-      color: inherit;
-      border: 0;
-  }
-  .light-item:hover, .light-item:active, .light-item-active{
-      background-color: rgba(60, 67, 72) !important;
-  }
-  .light-item a{
-    width: 100%!important;
-    height: 100%!important;
-    display: block;
-    color: #f8f9fa !important;
-    text-align: left;
-  }
-  .inrow-menu{
+    #nav a.router-link-exact-active {
+        color: #42b983;
+    }
+    code{
+        color: #e83e8c!important;
+    }
+    .inrow-menu .list-group .list-group-item{
+        border-radius: 5px 0 0 5px;
+        background-color: inherit;
+        color: inherit;
+        border: 0;
+    }
+    .light-item:hover, .light-item:active, .light-item-active{
+        background-color: rgba(60, 67, 72) !important;
+    }
+    .light-item a{
+        width: 100%!important;
+        height: 100%!important;
+        display: block;
+        color: #f8f9fa !important;
+        text-align: left;
+    }
+    .inrow-menu{
         max-width: 25% !important;
     }
 
-  .h-100vh{
-      height: calc(100vh - 58.6px);
-  }
-  .work-shadow{
-      box-shadow: inset 0 .5rem 1rem rgba(0,0,0,.35)!important;
-  }
-  .max-fluid-container-width{
-    max-width: 1200px;
-  }
-  .mw-75 {
-    min-width: 75%!important;
-  }
+    .h-100vh{
+        height: calc(100vh - 58.6px);
+    }
+    .work-shadow{
+        box-shadow: inset 0 .5rem 1rem rgba(0,0,0,.35)!important;
+    }
+    .max-fluid-container-width{
+        max-width: 1200px;
+    }
+    .mw-75 {
+        min-width: 75%!important;
+    }
+
+    .ocmenu{
+        max-width: 300px !important;
+        position: fixed !important;
+        z-index: 10;
+        height: calc( 100% - 56.6px );
+    }
+    .ocmenu-shadow{
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.35)!important;
+    }
+
   .enable-scroll{
     overflow-y: auto !important;
   }
