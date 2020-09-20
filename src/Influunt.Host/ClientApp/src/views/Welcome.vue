@@ -2,7 +2,7 @@
     <div class="row align-items-center h-100vh">
         <b-jumbotron class="bg-dark text-light width-max height-max jbg" header="Influunt Welcome">
             <p>Welcome to the lightweight RSS news feed aggregator.</p>
-            <b-button variant="outline-danger" href="/api/account/login/google">
+            <b-button variant="outline-danger" href="#" @click="auth">
                 <img class="icon" src="../assets/google.png"/>
                 Sing In with google
             </b-button>
@@ -12,7 +12,17 @@
 
 <script>
 export default {
-  name: 'Welcome'
+  name: 'Welcome',
+  data: function(){
+      return {
+          login: "/api/account/login/google"
+      }
+  },
+  methods: {
+      auth: function(){
+          window.location.href = this.login
+      }
+  }
 }
 </script>
 
