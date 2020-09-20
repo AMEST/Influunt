@@ -57,6 +57,7 @@ export default {
     }
   },
   methods:{
+    // eslint-disable-next-line
     resizeHandler: function(e){
       this.needMenuClosable = (window.innerWidth <= 800)? true: false
     },

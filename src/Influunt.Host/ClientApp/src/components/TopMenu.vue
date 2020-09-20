@@ -37,6 +37,7 @@ export default {
     changeMenuState: function(){
           this.$store.commit("changeMenuState", !this.$store.state.application.isMenuOpened);
       },
+    // eslint-disable-next-line
     resizeHandler: function(e){
       this.needMenuClosable = (window.innerWidth <= 800)? true: false
     }
