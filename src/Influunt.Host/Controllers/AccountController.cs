@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Influunt.Host.Controllers
 {
@@ -24,6 +25,13 @@ namespace Influunt.Host.Controllers
             return new JsonResult(user);
         }
 
+        [HttpGet("login")]
+        [Authorize]
+        public IActionResult SignIn()
+        {
+            return Redirect("/");
+        }
+
         [HttpGet("login/google")]
         public async Task<IActionResult> SignInGoogle()
         {
@@ -31,14 +39,14 @@ namespace Influunt.Host.Controllers
             if(user == null || string.IsNullOrWhiteSpace(user.Email))
                 return Challenge("Google");
 
-            return RedirectPermanent("/");
+            return Redirect("/");
         }
 
         [HttpGet("[action]")]
         public async Task<IActionResult> SignOut()
         {
             await HttpContext.SignOutAsync();
-            return RedirectPermanent("/");
+            return Redirect("/");
         }
     }
 }
