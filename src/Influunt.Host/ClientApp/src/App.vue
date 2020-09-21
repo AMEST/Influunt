@@ -76,7 +76,7 @@ export default {
         self.isAuthenticated = true
         self.profile = currentProfile
       }
-    }, true)
+    }, false)
     this.needMenuClosable = (window.innerWidth <= 800)? true: false
     window.addEventListener("resize", this.resizeHandler);
   }
