@@ -3,6 +3,7 @@ using Influunt.MongoStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.SpaServices;
@@ -25,6 +26,9 @@ namespace Influunt.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services
+                .AddDataProtection()
+                .SetApplicationName("Influunt");
             services.AddControllers();
             services.Configure<ForwardedHeadersOptions>(options =>
             {
@@ -57,6 +61,7 @@ namespace Influunt.Host
             var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<MongoStorageConfiguration>();
             services.AddRssModule();
             services.AddMongoStorage(storageCfg);
+            services.AddMongoDataProtection();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
