@@ -36,10 +36,16 @@ namespace Influunt.Host.Controllers
         public async Task<IActionResult> SignInGoogle()
         {
             var user = await _userService.GetCurrentUser();
-            if(user == null || string.IsNullOrWhiteSpace(user.Email))
-                return Challenge("Google");
 
-            return Redirect("/");
+            if (user != null && !string.IsNullOrWhiteSpace(user.Email)) 
+                return Redirect("/");
+
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true
+            };
+            return Challenge(authProperties,"Google");
+
         }
 
         [HttpGet("[action]")]
