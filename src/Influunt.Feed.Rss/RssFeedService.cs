@@ -1,6 +1,7 @@
 ﻿using Influunt.Feed.Entity;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -27,24 +28,38 @@ namespace Influunt.Feed.Rss
 
         public async Task<IEnumerable<FeedItem>> GetFeed(User user, int? offset = null, int count = 10)
         {
+            var sw = Stopwatch.StartNew();
             var userChannels = await _channelService.GetUserChannels(user);
             var feed = new List<FeedItem>();
+
+            var taskList = new List<Task<List<FeedItem>>>();
+
             foreach (var channel in userChannels)
             {
-                if (_memoryCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> channelFeed))
+                var channelTask = Task.Run<List<FeedItem>>(async () =>
                 {
-                    feed.AddRange(channelFeed);
-                    continue;
-                }
+                    if (_memoryCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> channelFeed))
+                    {
+                        return channelFeed;
+                    }
 
-                channelFeed = await GetFeedFromChannel(channel);
-                _memoryCache.Set($"channel_url_{channel.Url}", channelFeed, new MemoryCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                    channelFeed = await GetFeedFromChannel(channel);
+                    _memoryCache.Set($"channel_url_{channel.Url}", channelFeed, new MemoryCacheEntryOptions
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                    });
+                    return channelFeed;
                 });
-                feed.AddRange(channelFeed);
+                taskList.Add(channelTask);
             }
 
+            await Task.WhenAll(taskList);
+
+            foreach (var task in taskList)
+            {
+                feed.AddRange(task.Result);
+            }
+            _logger.LogDebug($"Elapsed time for getting user ({user.Id}) feed: {sw.Elapsed.TotalMilliseconds}ms");
             feed = feed.OrderBy(f => string.IsNullOrWhiteSpace(f?.Date)
                 ? DateTime.UtcNow
                 : DateTime.Parse(f.Date)).ToList();
@@ -101,7 +116,7 @@ namespace Influunt.Feed.Rss
 
                 XmlSerializer ser = new XmlSerializer(typeof(RssBody));
                 RssBody rssBody;
-                rssBody = (RssBody) ser.Deserialize(xmlRss);
+                rssBody = (RssBody)ser.Deserialize(xmlRss);
 
                 return rssBody.Channel.Item.Select(rssItem => new FeedItem
                 {
