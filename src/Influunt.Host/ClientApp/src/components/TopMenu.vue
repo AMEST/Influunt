@@ -4,7 +4,7 @@
             <b-container>
                 <b-icon v-if="needMenuClosable && this.isAuth" icon="list" class="menu-button" @click="changeMenuState" />
                 <b-navbar-brand href="#">
-                    <img class="topicon" src="../assets/rss.png" />Influunt
+                    <img class="topicon" src="../assets/rss.png" alt="rss"/>Influunt
                 </b-navbar-brand>
                 <!-- Right aligned nav items -->
                 <b-navbar-nav class="ml-auto">

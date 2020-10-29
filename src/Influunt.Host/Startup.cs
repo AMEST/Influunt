@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.SpaServices;
 using Microsoft.Extensions.Configuration;
@@ -49,7 +50,7 @@ namespace Influunt.Host
 
                     options.ClientId = googleAuthNSection["ClientId"];
                     options.ClientSecret = googleAuthNSection["ClientSecret"];
-                    _ = options.Scope;
+                    options.CorrelationCookie.SameSite = SameSiteMode.Lax;
                 });
             // In production, the Vue files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
