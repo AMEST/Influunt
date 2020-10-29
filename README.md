@@ -44,5 +44,12 @@ docker stack deploy -c deploy.yml influunt
 
 **Docker run:**
 ```bash
-docker run -d 
+docker run -d \
+           -p 30002:80 \
+           -e "ConnectionStrings:Mongo:ConnectionString=[MONGO DB CONNECTION STRING]" \
+           -e "Authentication:Google:ClientSecret=[GOOGLE CLIENT SECRET]" \
+           -e "Authentication:Google:ClientId=[GOOGLE CLIENT ID]" \
+           --restart always \
+           --name influunt \
+           eluki/influunt
 ```
