@@ -1,3 +1,7 @@
+![CI](https://github.com/AMEST/Influunt/workflows/CI/badge.svg?branch=master)
+![hub.docker.com](https://img.shields.io/docker/pulls/eluki/influunt.svg) 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/amest/influunt)
+![GitHub](https://img.shields.io/github/license/amest/influunt)
 # Influunt - rss agregator 
 ### Links
 * **[Try Influunt](https://influunt.tk)**  
