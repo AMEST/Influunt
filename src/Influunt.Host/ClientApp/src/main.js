@@ -13,8 +13,16 @@ import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
+// Add to home screen
+window.addEventListener('beforeinstallprompt', function (event) {
+  if ((window.localStorage.installPrompt === undefined) || (window.localStorage.installPrompt === 'undefined')) {
+    window.localStorage.installPrompt = 'success'
+    console.log('[beforeinstallprompt]', 'prompt')
+    event.prompt()
+  }
+})
 // Initialize FontAwesome
-library.add(faGithub,faUserSecret)
+library.add(faGithub, faUserSecret)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 // Install BootstrapVue
 Vue.use(BootstrapVue)
