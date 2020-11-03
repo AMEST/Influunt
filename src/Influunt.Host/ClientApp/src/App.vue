@@ -24,6 +24,9 @@
                 </router-link>
               </b-list-group-item>
             </b-list-group>
+            <div align="center"> 
+              <a class="text-muted" href="https://github.com/AMEST/influunt" >Fork me on GitHub <font-awesome-icon :icon="{ prefix: 'fab', iconName: 'github' }" /> </a>
+            </div>
           </b-col>
 
           <b-col class="work-shadow mw-75">
@@ -142,7 +145,7 @@ export default {
     }
 
     .ocmenu{
-        max-width: 300px !important;
+        max-width: 222px !important;
         position: fixed !important;
         z-index: 10;
         height: calc( 100% - 56.6px );
@@ -153,6 +156,7 @@ export default {
 
   .enable-scroll{
     overflow-y: auto !important;
+    overflow-x: hidden;
   }
   /* Scroll */
   /* width */

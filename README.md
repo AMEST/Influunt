@@ -10,7 +10,14 @@
 Simple aggregator of rss news feeds. Implements a single news feed, with the ability to save posts to favorites, for further reading or as a note about an interesting article.   
 In order to use the service, you need to log in (so that the user can add his channels and refer to selected articles). Authorization via Google is implemented as standard, but if the self hosted option does not suit you, you can safely replace it with another provider.   
 
-### Requirements
+### Features
+1. Infinite news feed (while has news inside channels)
+1. Receiving news feed in parts (10 news)
+1. Authorization: Google and Guest (for try service or local / self-hosted using)
+1. Favorites
+1. PWA functional
+
+### Self-hosted Requirements
 * MongoDB - For storing user data (channels, favorites) and for aspnet core secure storage.
 * AspNet Core 3.1 runtime or Docker for service start
 * Optional reverse proxy for https connection

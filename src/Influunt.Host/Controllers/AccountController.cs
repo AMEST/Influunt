@@ -1,7 +1,10 @@
-﻿using Influunt.Feed;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
+using Influunt.Feed;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Influunt.Host.Controllers
@@ -45,6 +48,29 @@ namespace Influunt.Host.Controllers
                 IsPersistent = true
             };
             return Challenge(authProperties,"Google");
+
+        }
+
+        /// <summary>
+        /// Sing In as guest for try service
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("login/guest")]
+        public async Task<IActionResult> SignInAsGuest()
+        {
+            var claims = new List<Claim>{
+                new Claim(ClaimTypes.Name, "Guest"),
+                new Claim(ClaimTypes.Email, "guest@local"),
+            };
+            var claimsIdentity = new ClaimsIdentity(
+                claims, "GuestScheme");
+
+            var authProperties = new AuthenticationProperties();
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity), authProperties);
+
+            return Redirect("/");
 
         }
 
