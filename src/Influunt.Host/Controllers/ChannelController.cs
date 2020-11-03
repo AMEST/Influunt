@@ -43,27 +43,36 @@ namespace Influunt.Host.Controllers
         }
 
         [HttpPost]
-        public async void Post([FromBody] FeedChannel channel)
+        public async Task<IActionResult> Post([FromBody] FeedChannel channel)
         {
             var user = await _userService.GetCurrentUser();
+            if (!ValidateChannel(channel))
+                return BadRequest();
+
             channel.UserId = user.Id;
             await _channelService.Add(channel);
+
+            return Ok();
         }
 
         [HttpPut("{id}")]
-        public async void Put(string id, [FromBody] FeedChannel channel)
+        public async Task<IActionResult> Put(string id, [FromBody] FeedChannel channel)
         {
             var user = await _userService.GetCurrentUser();
+            if (!ValidateChannel(channel))
+                return BadRequest();
+
             var channelInStore = await _channelService.Get(id);
             if (!channelInStore.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
             {
                 Response.StatusCode = (int) HttpStatusCode.Forbidden;
-                return;
+                return BadRequest();
             }
 
             channel.Id = channelInStore.Id;
             channel.UserId = channelInStore.UserId;
             await _channelService.Update(user, channel);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
@@ -72,6 +81,17 @@ namespace Influunt.Host.Controllers
             var user = await _userService.GetCurrentUser();
             var channel = await _channelService.Get(id);
             await _channelService.Remove(user, channel);
+        }
+
+        private static bool ValidateChannel(FeedChannel channel)
+        {
+            if (string.IsNullOrWhiteSpace(channel.Name)
+                || string.IsNullOrWhiteSpace(channel.Url)
+                ||(!channel.Url.StartsWith("http://")
+                && !channel.Url.StartsWith("https://")))
+                return false;
+
+            return true;
         }
     }
 }

@@ -27,6 +27,15 @@
         v-bind:url="item.url"
         />
     </b-list-group>
+    <b-alert
+      :show="this.alert.dismissCountDown"
+      dismissible 
+      v-bind:variant="this.alert.variant"
+      @dismissed="this.alert.dismissCountDown=0"
+      @dismiss-count-down="CountDownChanged"
+      class="alert-position">
+        {{ this.alert.text }}
+      </b-alert>
   </div>
 </template>
 <script>
@@ -40,11 +49,27 @@ export default {
     return {
       channels:[],
       newChannelName:"",
-      newChannelUrl:""
+      newChannelUrl:"",
+      alert:{
+        text:"",
+        dismissCountDown:0,
+        variant:"danger"
+      }
     }
   },
   methods:{
     AddChannel: function(){
+      
+      if(this.newChannelName == undefined || this.newChannelName == ""){
+        this.ShowAlert("Channel name is empty",8)
+        return
+      }
+    
+      if(this.newChannelUrl == undefined || (!this.newChannelUrl.startsWith("http://") && !this.newChannelUrl.startsWith("https://"))){
+        this.ShowAlert("Channel url expected start with http or https",8)
+        return
+      }
+
       var self = this
       InfluuntApi.AddChannel({
         "name":self.newChannelName,
@@ -62,7 +87,15 @@ export default {
           })
         },500)
       })
+    },
+    CountDownChanged: function(dismissCountDown) {
+        this.alert.dismissCountDown = dismissCountDown
+    },
+    ShowAlert: function(text, seconds){
+      this.alert.text = text
+      this.alert.dismissCountDown = parseInt(seconds)
     }
+
   },
   mounted: function(){
     var self = this
@@ -80,6 +113,12 @@ export default {
     .form-control{
         background-color: transparent;
         color: #f8f9fa;
-        border-color: #dc3545;
+        border-color: #6c757d;
+    }
+
+    .alert-position{
+      position: fixed;
+      top: 64px;
+      right: 0;
     }
 </style>

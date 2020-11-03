@@ -7,6 +7,9 @@
                 Sing In with google
             </b-button>
         </b-jumbotron>
+        <div align="center" class="fork-me"> 
+              <a class="text-muted" href="https://github.com/AMEST/influunt" >Fork me on GitHub <font-awesome-icon :icon="{ prefix: 'fab', iconName: 'github' }" /> </a>
+        </div>
     </div>
 </template>
 
@@ -43,5 +46,10 @@ export default {
     .jbg{
         background-image: url("/img/bg.jpg");
         background-position: center;
+    }
+    .fork-me{
+        position: fixed;
+        bottom: 0px;
+        left: 25px;
     }
 </style>
