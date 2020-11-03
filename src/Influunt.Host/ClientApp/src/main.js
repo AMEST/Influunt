@@ -10,10 +10,11 @@ import store from './store'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
+import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // Initialize FontAwesome
-library.add(faGithub)
+library.add(faGithub,faUserSecret)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 // Install BootstrapVue
 Vue.use(BootstrapVue)

@@ -156,6 +156,7 @@ export default {
 
   .enable-scroll{
     overflow-y: auto !important;
+    overflow-x: hidden;
   }
   /* Scroll */
   /* width */
