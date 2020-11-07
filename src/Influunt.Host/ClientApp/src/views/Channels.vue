@@ -17,7 +17,11 @@
           <b-form-input v-model="newChannelUrl"></b-form-input>
         </b-col>
       </b-row>
-        <div align="right" class="mt-2"><b-button variant="outline-secondary" v-on:click="AddChannel">Add channel</b-button></div>
+        <div align="right" class="mt-2">
+          <b-button v-if="mode=='new'" variant="outline-secondary" v-on:click="AddChannel">Add channel</b-button>
+          <b-button v-if="mode=='edit'" variant="outline-secondary" v-on:click="UpdateChannel">Update channel</b-button>
+          <b-button variant="outline-secondary" class="ml-2" v-on:click="ClearState">Cancel</b-button>
+        </div>
     </b-card>
     <b-list-group>
       <ChannelItem v-for="(item, key) in this.channels" 
@@ -25,6 +29,8 @@
         v-bind:name="item.name" 
         v-bind:id="item.id" 
         v-bind:url="item.url"
+        v-bind:channel=item
+        @onEdit="OnEditChannel"
         />
     </b-list-group>
     <b-alert
@@ -50,6 +56,8 @@ export default {
       channels:[],
       newChannelName:"",
       newChannelUrl:"",
+      mode:"new",
+      editChannel:{},
       alert:{
         text:"",
         dismissCountDown:0,
@@ -75,11 +83,9 @@ export default {
         "name":self.newChannelName,
         "url":self.newChannelUrl
       },
+      // eslint-disable-next-line
       function(r){
-        // eslint-disable-next-line
-        var rr = r
-        self.newChannelName = ""
-        self.newChannelUrl = ""
+        self.ClearState()
         setTimeout(function(){
           InfluuntApi.GetChannels(function(request){
             self.channels = JSON.parse(request.response)
@@ -87,6 +93,39 @@ export default {
           })
         },500)
       })
+
+    },
+    UpdateChannel: function(){
+      if(this.newChannelName == undefined || this.newChannelName == ""){
+        this.ShowAlert("Channel name is empty",8)
+        return
+      }
+    
+      if(this.newChannelUrl == undefined || (!this.newChannelUrl.startsWith("http://") && !this.newChannelUrl.startsWith("https://"))){
+        this.ShowAlert("Channel url expected start with http or https",8)
+        return
+      }
+      this.editChannel.name = this.newChannelName
+      this.editChannel.url = this.newChannelUrl
+
+      var self = this
+      InfluuntApi.UpdateChannel(this.editChannel, function(r){
+        self.ClearState()
+        setTimeout(function(){
+          InfluuntApi.GetChannels(function(request){
+            self.channels = JSON.parse(request.response)
+            self.$forceUpdate()
+          })
+        },500)
+      })
+
+    },
+    OnEditChannel: function(channel){
+        console.info('[Edit]', 'emitted channel: '+ channel.id)
+        this.mode = "edit"
+        this.editChannel = channel
+        this.newChannelName = channel.name
+        this.newChannelUrl = channel.url
     },
     CountDownChanged: function(dismissCountDown) {
         this.alert.dismissCountDown = dismissCountDown
@@ -94,6 +133,12 @@ export default {
     ShowAlert: function(text, seconds){
       this.alert.text = text
       this.alert.dismissCountDown = parseInt(seconds)
+    },
+    ClearState: function(){
+      this.newChannelName = ""
+      this.newChannelUrl = ""
+      this.editChannel = {}
+      this.mode = "new"
     }
 
   },

@@ -49,6 +49,15 @@ var InfluuntApi = {
         }
         request.send()
     },
+    UpdateChannel: function(data, callback = (request) => { }, async = true){
+        var request = new XMLHttpRequest()
+        request.open("PUT", "/api/channel/"+data.id, async)
+        request.setRequestHeader("Content-Type","application/json")
+        request.onload = function () {
+            callback(request)
+        }
+        request.send(JSON.stringify(data))
+    },
     AddFavorite: function(data, callback = (request) => { }, async = true){
         var request = new XMLHttpRequest()
         request.open("POST", "/api/favorite", async)

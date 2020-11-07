@@ -34,20 +34,19 @@ namespace Influunt.Feed.Rss
 
             var taskList = new List<Task<List<FeedItem>>>();
 
-            foreach (var channel in userChannels)
+            foreach (var channel in userChannels.Where( c => !c.Hidden))
             {
-                var channelTask = Task.Run<List<FeedItem>>(async () =>
+                var channelTask = Task.Run(async () =>
                 {
                     if (_memoryCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> channelFeed))
-                    {
                         return channelFeed;
-                    }
 
                     channelFeed = await GetFeedFromChannel(channel);
-                    _memoryCache.Set($"channel_url_{channel.Url}", channelFeed, new MemoryCacheEntryOptions
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-                    });
+                    if (channelFeed.Any())
+                        _memoryCache.Set($"channel_url_{channel.Url}", channelFeed, new MemoryCacheEntryOptions
+                        {
+                            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                        });
                     return channelFeed;
                 });
                 taskList.Add(channelTask);
@@ -59,22 +58,24 @@ namespace Influunt.Feed.Rss
             {
                 feed.AddRange(task.Result);
             }
+
             _logger.LogDebug($"Elapsed time for getting user ({user.Id}) feed: {sw.Elapsed.TotalMilliseconds}ms");
-            feed = feed.OrderBy(f => string.IsNullOrWhiteSpace(f?.Date)
+            feed = feed.OrderBy(f => 
+                string.IsNullOrWhiteSpace(f?.Date)
                 ? DateTime.UtcNow
-                : DateTime.Parse(f.Date)).ToList();
+                : DateTime.Parse(f.Date)
+                ).ToList();
+            feed.Reverse();
 
-            if (offset != null)
-            {
-                var remainingElements = feed.Count - offset.Value;
-                if (remainingElements < count)
-                    return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
-                        remainingElements < 0 ? 0 : remainingElements);
+            if (offset == null) return feed;
 
-                return feed.GetRange(offset.Value, count);
-            }
+            var remainingElements = feed.Count - offset.Value;
+            if (remainingElements < count)
+                return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
+                    remainingElements < 0 ? 0 : remainingElements);
 
-            return feed;
+            return feed.GetRange(offset.Value, count);
+
         }
 
         public async Task<IEnumerable<FeedItem>> GetFeed(User user, FeedChannel channel, int? offset = null,

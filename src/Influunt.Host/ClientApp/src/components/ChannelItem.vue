@@ -1,7 +1,9 @@
 <template>
     <b-list-group-item v-if="!deleted" class="bg-dark text-light" style="display:flex">
-        <span style="width:100%; line-height: 32px;">{{ name }}</span>
+        <span style="width:85%; line-height: 32px;">{{ name }}</span>
         <div>
+            <b-button variant="outline-warning" class="but" v-on:click="Edit"><b-icon icon="pencil" class="mr-2"/></b-button>
+            <b-button variant="outline-warning" class="but" v-on:click="TurnChannelVisible"><b-icon v-bind:icon="channel.hidden ? 'eye-slash':'eye'" class="mr-2"/></b-button>
             <b-button variant="outline-danger" class="but" v-on:click="RemoveChannel"><b-icon icon="trash-fill" class="mr-2"/></b-button>
         </div>
     </b-list-group-item>
@@ -13,7 +15,8 @@ export default {
     props:{
         name:String,
         id:String,
-        url:String
+        url:String,
+        channel:Object
     },
     data: function(){
         return {
@@ -21,6 +24,13 @@ export default {
         }
     },
     methods:{
+        Edit: function(){
+            this.$emit("onEdit",this.channel)
+        },
+        TurnChannelVisible: function(){
+            this.channel.hidden = !this.channel.hidden
+            InfluuntApi.UpdateChannel(this.channel)
+        },
         RemoveChannel: function(){
             var self = this
             InfluuntApi.RemoveChannel(self.id,function(r){
@@ -39,6 +49,7 @@ export default {
         width: 32px;
         height: 32px;
         padding: 5px;
+        margin-right: 5px;
     }
     .list-group-item:hover{
         background-color: rgba(60, 67, 72) !important;
