@@ -122,7 +122,6 @@ export default {
 
     },
     OnEditChannel: function(channel){
-        console.info('[Edit]', 'emitted channel: '+ channel.id)
         this.mode = "edit"
         this.editChannel = channel
         this.newChannelName = channel.name
