@@ -7,6 +7,9 @@
         public string Name { get; set; }
 
         public string UserId { get; set; }
+
+        public bool Hidden { get; set; } = false;
+
         public string Id { get; set; }
     }
 }

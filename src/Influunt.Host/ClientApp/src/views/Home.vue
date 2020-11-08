@@ -68,8 +68,8 @@ export default {
         feedNews = feedNews.sort(function (a, b) {
           var dateA = new Date(a.date)
           var dateB = new Date(b.date)
-          return dateA < dateB
-        }).reverse()
+          return dateB - dateA
+        })
         feedNews.forEach(element => {
           self.feed.push(element)
         });
