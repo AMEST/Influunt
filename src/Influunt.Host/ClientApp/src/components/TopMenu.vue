@@ -13,7 +13,7 @@
                         <template v-slot:button-content>
                             <em>{{email}}</em>
                         </template>
-                        <b-dropdown-item href="/api/account/SignOut">Sign Out</b-dropdown-item>
+                        <b-dropdown-item class="bg-dark" href="/api/account/SignOut">Sign Out</b-dropdown-item>
                     </b-nav-item-dropdown>
                 </b-navbar-nav>
             </b-container>
@@ -60,5 +60,20 @@ export default {
         width: 32px;
         height: 32px;
         cursor: pointer;
+    }
+    .dropdown-menu {
+      background-color: #343a40!important;
+    }
+
+    .dropdown-menu:focus{
+      background-color: #343a40!important;
+    }
+
+    .dropdown-menu .dropdown-item {
+      color: #f8f9fa!important;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+      background-color: rgba(60, 67, 72) !important;
     }
 </style>

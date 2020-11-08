@@ -109,6 +109,7 @@ export default {
       this.editChannel.url = this.newChannelUrl
 
       var self = this
+      // eslint-disable-next-line
       InfluuntApi.UpdateChannel(this.editChannel, function(r){
         self.ClearState()
         setTimeout(function(){
