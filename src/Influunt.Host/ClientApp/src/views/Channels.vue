@@ -1,5 +1,5 @@
 <template>
-  <div class="Channels pt-2 enable-scroll" style="text-align:left">
+  <div class="Channels pt-2 enable-scroll">
     <b-card class="light-gray-dark text-light mb-3" title="Add channel">
       <b-row>
         <b-col class="w-25" sm="3">
@@ -169,5 +169,6 @@ export default {
 
     .Channels{
       max-height: calc(100vh - 63.8px);
+      text-align: left;
     }
 </style>
