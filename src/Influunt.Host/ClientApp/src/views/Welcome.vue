@@ -13,19 +13,24 @@
             </b-button>
             <p>Try Influunt as a guest. All data is visible to other guests!</p>
         </b-jumbotron>
-        <div align="center" class="fork-me"> 
-              <a class="text-muted" href="https://github.com/AMEST/influunt" >Fork me on GitHub <font-awesome-icon :icon="{ prefix: 'fab', iconName: 'github' }" /> </a>
+        <div class="ver">
+            <span class="text-muted pr-2">Version: {{this.version}}</span>
+        </div>
+        <div class="fork-me"> 
+            <a class="text-muted" href="https://github.com/AMEST/influunt" >Fork me on GitHub <font-awesome-icon :icon="{ prefix: 'fab', iconName: 'github' }" /> </a>
         </div>
     </div>
 </template>
 
 <script>
+import InfluuntApi from "@/influunt"
 export default {
   name: 'Welcome',
   data: function(){
       return {
           login: "/api/account/login/google",
-          guestLogin:"/api/account/login/guest"
+          guestLogin:"/api/account/login/guest",
+          version:""
       }
   },
   methods: {
@@ -35,6 +40,13 @@ export default {
       guestAuth: function(){
           window.location.href = this.guestLogin
       }
+  },
+  created: function() {
+      var self = this
+      InfluuntApi.GetVersion(function(request){
+        var versionResult = JSON.parse(request.response)
+        self.version = versionResult.version
+      })
   }
 }
 </script>
@@ -64,5 +76,10 @@ export default {
         position: fixed;
         bottom: 0px;
         left: 25px;
+    }
+    .ver{
+        position: fixed;
+        bottom: 25px;
+        left: 25px; 
     }
 </style>

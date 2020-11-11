@@ -82,6 +82,14 @@ var InfluuntApi = {
             callback(request)
         }
         request.send()
+    },
+    GetVersion: function(callback = (request) => {}){
+        var request = new XMLHttpRequest()
+        request.open("GET", "/api/version")
+        request.onload = function () {
+            callback(request)
+        }
+        request.send()
     }
         
 }
