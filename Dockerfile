@@ -12,7 +12,7 @@ RUN apt-get update -yq ;\
 	curl -sL https://deb.nodesource.com/setup_14.x | bash - ;\
 	apt-get install -y nodejs
 	
-RUN sed -i -e "s/<Version>0-develop<\/Version>/<Version>$(cat version)<\/Version>/g" src/Influunt.Host/Influunt.Host.csproj;\
+RUN sed -i -e "s/<Version>0-develop<\/Version>/<Version>$(cat version | cut -c2- )<\/Version>/g" src/Influunt.Host/Influunt.Host.csproj;\
     dotnet restore -s https://api.nuget.org/v3/index.json; \
     dotnet build --no-restore -c Release; \    
     dotnet publish ./src/Influunt.Host/Influunt.Host.csproj -c Release -o /app --no-build; \
