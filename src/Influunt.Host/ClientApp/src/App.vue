@@ -14,8 +14,8 @@
                 </router-link>
               </b-list-group-item>
               <b-list-group-item class="light-item">
-                <router-link to="/favorite">
-                  <b-icon icon="star-fill" class="ml-1 mr-1"/> Favorite
+                <router-link class="pl-1" to="/favorite">
+                  <b-icon icon="star-fill" class="mr-2"/> Favorite
                 </router-link>
                </b-list-group-item>
               <b-list-group-item class="light-item">
