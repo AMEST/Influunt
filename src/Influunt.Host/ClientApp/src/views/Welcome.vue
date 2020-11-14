@@ -4,17 +4,17 @@
             <h5 class="pb-4">Welcome to the lightweight RSS news feed aggregator.</h5>
             <b-button variant="outline-danger" href="#" class="auth-standart-button-size" @click="auth">
                 <img class="icon" src="../assets/google.png"/>
-                Sing In with google
+                Sign In with google
             </b-button>
             <p class="pt-2"> Or </p>
             <b-button variant="outline-danger" href="#" class="auth-standart-button-size" @click="guestAuth">
                 <font-awesome-icon style="color:#fff;" size="lg" icon="user-secret" class="mr-2" />
-                Sing In as guest
+                Sign In as guest
             </b-button>
             <p>Try Influunt as a guest. All data is visible to other guests!</p>
         </b-jumbotron>
         <div class="ver">
-            <span class="text-muted pr-2">Version: {{this.version}}</span>
+            <span class="text-muted pr-2">Version: {{this.$store.state.application.version}}</span>
         </div>
         <div class="fork-me"> 
             <a class="text-muted" href="https://github.com/AMEST/influunt" >Fork me on GitHub <font-awesome-icon :icon="{ prefix: 'fab', iconName: 'github' }" /> </a>
@@ -23,14 +23,12 @@
 </template>
 
 <script>
-import InfluuntApi from "@/influunt"
 export default {
   name: 'Welcome',
   data: function(){
       return {
           login: "/api/account/login/google",
-          guestLogin:"/api/account/login/guest",
-          version:""
+          guestLogin:"/api/account/login/guest"
       }
   },
   methods: {
@@ -40,13 +38,6 @@ export default {
       guestAuth: function(){
           window.location.href = this.guestLogin
       }
-  },
-  created: function() {
-      var self = this
-      InfluuntApi.GetVersion(function(request){
-        var versionResult = JSON.parse(request.response)
-        self.version = versionResult.version
-      })
   }
 }
 </script>

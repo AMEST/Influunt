@@ -25,7 +25,7 @@
               </b-list-group-item>
             </b-list-group>
             <div align="center"> 
-              <span class="text-muted">Version: {{ this.version }}</span>
+              <span class="text-muted">Version: {{ this.$store.state.application.version }}</span>
             </div>
             <div align="center"> 
               <a class="text-muted" href="https://github.com/AMEST/influunt" >Fork me on GitHub <font-awesome-icon :icon="{ prefix: 'fab', iconName: 'github' }" /> </a>
@@ -59,8 +59,7 @@ export default {
     return {
       isAuthenticated: false,
       profile: {email:null},
-      needMenuClosable: false,
-      version: ""
+      needMenuClosable: false
     }
   },
   methods:{
@@ -86,7 +85,7 @@ export default {
     }, false)
     InfluuntApi.GetVersion(function(request){
       var versionResult = JSON.parse(request.response)
-      self.version = versionResult.version
+      self.$store.commit("changeVersion",versionResult.version)
     })
     this.needMenuClosable = (window.innerWidth <= 800)? true: false
     window.addEventListener("resize", this.resizeHandler);

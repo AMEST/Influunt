@@ -125,8 +125,8 @@ namespace Influunt.Feed.Rss
                     Description = rssItem.Description,
                     Date = rssItem.PubDate,
                     Link = rssItem.Link?.ToString(),
-                    ChannelName = channel.Name
-                }).ToList();
+                    ChannelName = channel.Name ?? ""
+                }.NormalizeDescription()).ToList();
             }
             catch (Exception e)
             {

@@ -1,5 +1,5 @@
 <template>
-  <div class="home pt-5 enable-scroll" id="feed">
+  <div class="home pt-1 enable-scroll" id="feed">
     <div>Filter by channel: <b-form-select v-model="selectedChannelFilter" :options="Array.from(channels, x => x.name)" class="bg-dark text-light" style="width: 220px"></b-form-select></div>
     <b-row v-if="this.feed.length == 0" class="h-max align-items-center">
       <b-col class="text-center">
