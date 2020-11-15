@@ -82,7 +82,7 @@ export default {
         self.isAuthenticated = true
         self.profile = currentProfile
       }
-    }, false)
+    })
     InfluuntApi.GetVersion(function(request){
       var versionResult = JSON.parse(request.response)
       self.$store.commit("changeVersion",versionResult.version)
