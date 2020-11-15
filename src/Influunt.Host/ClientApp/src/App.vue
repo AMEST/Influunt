@@ -2,46 +2,48 @@
   <div id="app" class="bg-dark text-light" v-touch:swipe.right="swipeRight" v-touch:swipe.left="swipeLeft">
     <TopMenu v-bind:isAuth="this.isAuthenticated" v-bind:email="this.profile.email"/>
     <!--Main App-->
-    <div v-if="this.isAuthenticated">
-      <b-container fluid class="max-fluid-container-width">
-        <b-row class="h-100vh">
+    <div v-if="this.isLoaded">
+      <div v-if="this.isAuthenticated">
+        <b-container fluid class="max-fluid-container-width">
+          <b-row class="h-100vh">
 
-          <b-col v-if="this.$store.state.application.isMenuOpened || !needMenuClosable" class="inrow-menu pt-4 pr-0" v-bind:class="[needMenuClosable ? 'ocmenu ocmenu-shadow bg-dark' : 'w-25']">
-            <b-list-group>
-              <b-list-group-item class="light-item">
-                <router-link class="pl-1" to="/">
-                  <b-icon icon="rss" class="mr-2"/> Feed
-                </router-link>
-              </b-list-group-item>
-              <b-list-group-item class="light-item">
-                <router-link class="pl-1" to="/favorite">
-                  <b-icon icon="star-fill" class="mr-2"/> Favorite
-                </router-link>
-               </b-list-group-item>
-              <b-list-group-item class="light-item">
-                <router-link class="pl-1" to="/channels">
-                  <b-icon icon="receipt" class="mr-2"/> Channels
-                </router-link>
-              </b-list-group-item>
-            </b-list-group>
-            <div align="center"> 
-              <span class="text-muted">Version: {{ this.$store.state.application.version }}</span>
-            </div>
-            <div align="center"> 
-              <a class="text-muted" href="https://github.com/AMEST/influunt" >Fork me on GitHub <font-awesome-icon :icon="{ prefix: 'fab', iconName: 'github' }" /> </a>
-            </div>
-          </b-col>
+            <b-col v-if="this.$store.state.application.isMenuOpened || !needMenuClosable" class="inrow-menu pt-4 pr-0" v-bind:class="[needMenuClosable ? 'ocmenu ocmenu-shadow bg-dark' : 'w-25']">
+              <b-list-group>
+                <b-list-group-item class="light-item">
+                  <router-link class="pl-1" to="/">
+                    <b-icon icon="rss" class="mr-2"/> Feed
+                  </router-link>
+                </b-list-group-item>
+                <b-list-group-item class="light-item">
+                  <router-link class="pl-1" to="/favorite">
+                    <b-icon icon="star-fill" class="mr-2"/> Favorite
+                  </router-link>
+                </b-list-group-item>
+                <b-list-group-item class="light-item">
+                  <router-link class="pl-1" to="/channels">
+                    <b-icon icon="receipt" class="mr-2"/> Channels
+                  </router-link>
+                </b-list-group-item>
+              </b-list-group>
+              <div align="center"> 
+                <span class="text-muted">Version: {{ this.$store.state.application.version }}</span>
+              </div>
+              <div align="center"> 
+                <a class="text-muted" href="https://github.com/AMEST/influunt" >Fork me on GitHub <font-awesome-icon :icon="{ prefix: 'fab', iconName: 'github' }" /> </a>
+              </div>
+            </b-col>
 
-          <b-col class="work-shadow mw-75">
-            <router-view/>
-          </b-col>
+            <b-col class="work-shadow mw-75">
+              <router-view/>
+            </b-col>
 
-        </b-row>
-      </b-container>
-    </div>
-    <!-- SingIn Page -->
-    <div v-else>
-      <Welcome/>
+          </b-row>
+        </b-container>
+      </div>
+      <!-- SingIn Page -->
+      <div v-else>
+        <Welcome/>
+      </div>
     </div>
   </div>
 </template>
@@ -59,7 +61,8 @@ export default {
     return {
       isAuthenticated: false,
       profile: {email:null},
-      needMenuClosable: false
+      needMenuClosable: false,
+      isLoaded: false
     }
   },
   methods:{
@@ -82,6 +85,7 @@ export default {
         self.isAuthenticated = true
         self.profile = currentProfile
       }
+      self.isLoaded = true
     })
     InfluuntApi.GetVersion(function(request){
       var versionResult = JSON.parse(request.response)
@@ -95,6 +99,9 @@ export default {
 </script>
 
 <style>
+    body{
+      background-color: #343a40 !important;
+    }
     #app {
         font-family: Avenir,Helvetica,Arial,sans-serif;
         -webkit-font-smoothing: antialiased;
