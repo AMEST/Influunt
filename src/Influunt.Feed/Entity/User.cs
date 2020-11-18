@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Claims;
 
 namespace Influunt.Feed.Entity
@@ -9,6 +10,7 @@ namespace Influunt.Feed.Entity
         public string Name { get; set; }
         public string AuthProvider { get; set; }
         public string Id { get; set; }
+        public DateTime LastActivity { get; set; }
 
         public bool IsNullable()
         {

@@ -34,8 +34,13 @@ namespace Influunt.MongoStorage.Services
                 return null;
 
             var user = await GetUserByEmail(contextUser.Email);
-            
-            return user ?? await Add(contextUser);
+
+            if (user == null) return await Add(contextUser);
+
+            user.LastActivity = DateTime.UtcNow;
+            await Update(user);
+            return user;
+
         }
 
         public Task<User> GetUserById(string id)
@@ -52,6 +57,7 @@ namespace Influunt.MongoStorage.Services
         public async Task<User> Add(User user)
         {
             user.Id = ObjectId.GenerateNewId().ToString();
+            user.LastActivity = DateTime.UtcNow;
             await _userRepository.Create(user);
             return user;
         }
