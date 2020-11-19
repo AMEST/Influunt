@@ -8,14 +8,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Influunt.Feed.Rss
 {
-    public class FeedUpdatingWorker : BackgroundService
+    public class FeedUpdateWorker : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<FeedUpdatingWorker> _logger;
+        private readonly ILogger<FeedUpdateWorker> _logger;
         private readonly IRssFeedServiceConfiguration _configuration;
         private Timer _timer;
 
-        public FeedUpdatingWorker(IServiceProvider serviceProvider, ILogger<FeedUpdatingWorker> logger,
+        public FeedUpdateWorker(IServiceProvider serviceProvider, ILogger<FeedUpdateWorker> logger,
             IRssFeedServiceConfiguration configuration)
         {
             _serviceProvider = serviceProvider;
