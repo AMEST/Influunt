@@ -60,7 +60,7 @@ namespace Influunt.Host
             //AddModules
 
             var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<MongoStorageConfiguration>();
-            services.AddRssModule();
+            services.AddRssModule(Configuration.GetSection("FeedService"));
             services.AddMongoStorage(storageCfg);
             services.AddMongoDataProtection();
         }

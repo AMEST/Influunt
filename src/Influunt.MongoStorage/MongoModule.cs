@@ -6,6 +6,7 @@ using Influunt.MongoStorage.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoDB.Bson.Serialization.Conventions;
 
 namespace Influunt.MongoStorage
 {
@@ -14,6 +15,15 @@ namespace Influunt.MongoStorage
         public static IServiceCollection AddMongoStorage(this IServiceCollection services,
             IMongoStorageConfiguration configuration)
         {
+            // Register conventions
+            var pack = new ConventionPack
+            {
+                new IgnoreIfDefaultConvention(true),
+                new IgnoreExtraElementsConvention(true),
+            };
+
+            ConventionRegistry.Register("Influunt Convention", pack, t => true);
+
             services.AddSingleton(configuration);
             services.AddSingleton<IMongoDbContext, MongoDbContext>();
             services.AddMongoRepository<User, UserMap>();

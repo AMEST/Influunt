@@ -1,4 +1,5 @@
-﻿using Influunt.Feed.Entity;
+﻿using System;
+using Influunt.Feed.Entity;
 
 namespace Influunt.MongoStorage.Entity
 {
@@ -7,6 +8,10 @@ namespace Influunt.MongoStorage.Entity
         public UserMap()
         {
             ToCollection("users");
+
+            MapField(f => f.LastActivity)
+                .SetDefaultValue(DateTime.UnixEpoch)
+                .SetIgnoreIfDefault(false);
         }
     }
 }

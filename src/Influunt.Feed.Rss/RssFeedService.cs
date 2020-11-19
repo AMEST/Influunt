@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Influunt.Feed.Rss
 {
-    public class RssFeedService : IFeedService
+    internal class RssFeedService : IFeedService
     {
         private readonly IChannelService _channelService;
         private readonly IMemoryCache _memoryCache;
