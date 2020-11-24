@@ -10,24 +10,29 @@
     <div v-for="(item, key) in this.feed" v-bind:key="key">
       <FeedItem v-bind:title="item.title" v-bind:description="item.description" v-bind:date="item.date" v-bind:link="item.link" v-bind:id="item.id" v-bind:isFavorite="true" v-bind:channel="item.channelName"/>
     </div>
+    <LoadingBar v-if="this.isLoading" icon="sync" text="Loading favorites"/>
   </div>
 </template>
 
 <script>
 import InfluuntApi from "@/influunt"
 import FeedItem from "@/components/FeedItem.vue"
+import LoadingBar from "@/components/LoadingBar.vue"
 export default {
 name: 'favorite',
   components:{
-    FeedItem
+    FeedItem,
+    LoadingBar
   },
   data: function(){
     return {
-      feed:[]
+      feed:[],
+      isLoading: false
     }
   },
   created: function(){
     var self = this
+    this.isLoading = true
     InfluuntApi.GetFavorite(function(request){
       var favoriteFeed = JSON.parse(request.response)
       favoriteFeed = favoriteFeed.sort(function (a, b) {
@@ -38,6 +43,7 @@ name: 'favorite',
       favoriteFeed.forEach(element => {
         self.feed.push(element)
       });
+      self.isLoading = false
     })
   }
 }

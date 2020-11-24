@@ -3,7 +3,7 @@
         <b-navbar toggleable="lg" type="dark" variant="dark" class="shadow">
             <b-container>
                 <b-icon v-if="needMenuClosable && this.isAuth" icon="list" class="menu-button" @click="changeMenuState" />
-                <b-navbar-brand href="#">
+                <b-navbar-brand href="#" id="brand">
                     <img class="topicon" src="../assets/rss.png" alt="rss"/>Influunt
                 </b-navbar-brand>
                 <!-- Right aligned nav items -->
