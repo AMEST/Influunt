@@ -111,13 +111,10 @@ namespace Influunt.Feed.Rss
             try
             {
                 var result = await _rssClient.GetAsync(channel.Url);
-
                 var xmlRss = await result.Content.ReadAsStreamAsync();
 
-
-                XmlSerializer ser = new XmlSerializer(typeof(RssBody));
-                RssBody rssBody;
-                rssBody = (RssBody)ser.Deserialize(xmlRss);
+                var ser = new XmlSerializer(typeof(RssBody));
+                var rssBody = (RssBody)ser.Deserialize(xmlRss);
 
                 return rssBody.Channel.Item.Select(rssItem => new FeedItem
                 {
