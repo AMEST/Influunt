@@ -10,7 +10,7 @@ import store from './store'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
-import { faUserSecret } from '@fortawesome/free-solid-svg-icons'
+import { faUserSecret, faSync, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // Add to home screen
@@ -22,7 +22,7 @@ window.addEventListener('beforeinstallprompt', function (event) {
   }
 })
 // Initialize FontAwesome
-library.add(faGithub, faUserSecret)
+library.add(faGithub, faUserSecret, faSync, faExclamationTriangle)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 // Install BootstrapVue
 Vue.use(BootstrapVue)

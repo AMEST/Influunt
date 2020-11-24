@@ -11,16 +11,22 @@
     <div v-for="(item, key) in this.feed" v-bind:key="key">
       <FeedItem v-bind:title="item.title" v-bind:description="item.description" v-bind:date="item.date" v-bind:link="item.link" v-bind:channel="item.channelName"/>
     </div>
+    <LoadingBar v-if="this.isLoading" icon="sync" text="Loading feed"/>
+    <ErrorBar v-if="this.isError" text="Error when loading feed" buttonText="Try reload feed" @onErrorButton="TryLoadAfterError"/>
   </div>
 </template>
 
 <script>
 import InfluuntApi from "@/influunt"
 import FeedItem from "@/components/FeedItem.vue"
+import LoadingBar from "@/components/LoadingBar.vue"
+import ErrorBar from "@/components/ErrorBar.vue"
 export default {
   name: 'home',
   components:{
-    FeedItem
+    FeedItem,
+    LoadingBar,
+    ErrorBar
   },
   data: function(){
     return {
@@ -28,7 +34,9 @@ export default {
       selectedChannelFilter:"All",
       channels:[{"name":"All"}],
       scrollMax: 0,
-      offset:0
+      offset:0,
+      isLoading: false,
+      isError: false
     }
   },
   methods:{
@@ -38,8 +46,14 @@ export default {
       if(this.selectedChannelFilter != "All"){
         channel = this.channels.find(c => c.name == this.selectedChannelFilter)
       }
+      this.isLoading = true
+      InfluuntApi.GetFeed(function(request, successful){
+        if(!successful){
+          self.isError = true
+          self.isLoading = false
+          return
+        }
 
-      InfluuntApi.GetFeed(function(request){
         var feedNews = JSON.parse(request.response)
         feedNews = feedNews.sort(function (a, b) {
           var dateA = new Date(a.date)
@@ -49,7 +63,12 @@ export default {
         feedNews.forEach(element => {
           self.feed.push(element)
         });
+        self.isLoading = false
       },offset, channel)
+    },
+    TryLoadAfterError: function(){
+      this.InfinityFeed(this.offset)
+      this.isError = false
     }
   },
   watch:{
@@ -62,8 +81,14 @@ export default {
       if(val != "All"){
         channel = this.channels.find(c => c.name == val)
       }
-
-      InfluuntApi.GetFeed(function(request){
+      this.isLoading = true
+      InfluuntApi.GetFeed(function(request, successful){
+        if(!successful){
+          self.isError = true
+          self.isLoading = false
+          return
+        }
+        
         var feedNews = JSON.parse(request.response)
         feedNews = feedNews.sort(function (a, b) {
           var dateA = new Date(a.date)
@@ -73,6 +98,7 @@ export default {
         feedNews.forEach(element => {
           self.feed.push(element)
         });
+        self.isLoading = false
       },this.offset, channel)
     }
   },
@@ -81,13 +107,20 @@ export default {
     var feed = document.getElementById("feed")
     feed.onscroll = function(){   
       var wh = window.innerHeight-58.6
-        if ((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)) {
-          // eslint-disable-next-line
-          console.log("Download next 10 news. scrollTop:"+feed.scrollTop)
-          self.scrollMax = feed.scrollHeight
-          self.offset += 10
-          self.InfinityFeed(self.offset)
+      if ((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)) {
+        // eslint-disable-next-line
+        console.log("Download next 10 news. scrollTop:"+feed.scrollTop)
+        self.scrollMax = feed.scrollHeight
+        self.offset += 10
+        self.InfinityFeed(self.offset)
       }
+    }
+    var brandElement = document.getElementById("brand")
+    brandElement.onclick = function(){
+      feed.scrollTo({
+          top: 0,
+          behavior: "smooth"
+      });
     }
   },
   created: function(){
@@ -112,4 +145,5 @@ export default {
     .h-max{
       height: calc(100vh - 170px);
     }
+
 </style>

@@ -42,14 +42,17 @@
       class="alert-position">
         {{ this.alert.text }}
       </b-alert>
+      <LoadingBar v-if="this.isLoading" icon="sync" text="Loading channels"/>
   </div>
 </template>
 <script>
 import ChannelItem from "@/components/ChannelItem.vue"
 import InfluuntApi from "@/influunt"
+import LoadingBar from "@/components/LoadingBar.vue"
 export default {
   components:{
-    ChannelItem
+    ChannelItem,
+    LoadingBar
   },
   data: function(){
     return {
@@ -62,7 +65,8 @@ export default {
         text:"",
         dismissCountDown:0,
         variant:"danger"
-      }
+      },
+      isLoading:false
     }
   },
   methods:{
@@ -87,9 +91,11 @@ export default {
       function(r){
         self.ClearState()
         setTimeout(function(){
+          self.isLoading = true
           InfluuntApi.GetChannels(function(request){
             self.channels = JSON.parse(request.response)
             self.$forceUpdate()
+            self.isLoading = false
           })
         },500)
       })
@@ -113,9 +119,11 @@ export default {
       InfluuntApi.UpdateChannel(this.editChannel, function(r){
         self.ClearState()
         setTimeout(function(){
+          self.isLoading = true
           InfluuntApi.GetChannels(function(request){
             self.channels = JSON.parse(request.response)
             self.$forceUpdate()
+            self.isLoading = false
           })
         },500)
       })
@@ -144,8 +152,10 @@ export default {
   },
   mounted: function(){
     var self = this
+    this.isLoading = true
     InfluuntApi.GetChannels(function(request){
       self.channels = JSON.parse(request.response)
+      self.isLoading = false
     })
   }
 }

@@ -167,7 +167,6 @@ export default {
     .ocmenu-shadow{
         box-shadow: 0 .5rem 1rem rgba(0,0,0,.35)!important;
     }
-
   .enable-scroll{
     overflow-y: auto !important;
     overflow-x: hidden;
