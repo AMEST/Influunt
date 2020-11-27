@@ -45,7 +45,6 @@ namespace Influunt.Feed
         /// <summary>
         /// Обновление информации пользователя
         /// </summary>
-        /// <param name="id"></param>
         /// <param name="updatedUser"></param>
         /// <returns></returns>
         Task Update(User updatedUser);

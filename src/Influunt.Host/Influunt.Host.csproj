@@ -10,6 +10,7 @@
     <Description>Influunt - Simple Rss Agregator</Description>
     <Copyright>Klabukov Erik</Copyright>
     <Version>0-develop</Version>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
@@ -24,6 +25,13 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="1.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
     <PackageReference Include="VueCliMiddleware" Version="3.1.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1"/>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.5.1"/>
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.5.1"/>
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.5.1"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Influunt.Feed.Rss\Influunt.Feed.Rss.csproj" />

@@ -3,12 +3,16 @@ using System.Security.Claims;
 using Influunt.Feed;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Influunt.Feed.Entity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Influunt.Host.Controllers
 {
+    /// <summary>
+    /// Account api
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -20,7 +24,12 @@ namespace Influunt.Host.Controllers
             _userService = userService;
         }
 
+        /// <summary>
+        /// Returns current user profile or null
+        /// </summary>
+        /// <response code="200">User profile</response>
         [HttpGet("current")]
+        [ProducesResponseType(typeof(User),200)]
         public async Task<IActionResult> CurrentUser()
         {
             var user = await _userService.GetCurrentUser();
@@ -28,6 +37,10 @@ namespace Influunt.Host.Controllers
             return new JsonResult(user);
         }
 
+        /// <summary>
+        /// SignIn via default challenge
+        /// </summary>
+        /// <response code="302">Redirect to application home after signin</response>
         [HttpGet("login")]
         [Authorize]
         public IActionResult SignIn()
@@ -35,6 +48,10 @@ namespace Influunt.Host.Controllers
             return Redirect("/");
         }
 
+        /// <summary>
+        /// SignIn via Google challenge
+        /// </summary>
+        /// <response code="302">Redirect to application home after signin</response>
         [HttpGet("login/google")]
         public async Task<IActionResult> SignInGoogle()
         {
@@ -54,7 +71,7 @@ namespace Influunt.Host.Controllers
         /// <summary>
         /// Sing In as guest for try service
         /// </summary>
-        /// <returns></returns>
+        /// <response code="302">Redirect to application home after signin</response>
         [HttpGet("login/guest")]
         public async Task<IActionResult> SignInAsGuest()
         {
@@ -74,6 +91,10 @@ namespace Influunt.Host.Controllers
 
         }
 
+        /// <summary>
+        /// SignOut from service
+        /// </summary>
+        /// <response code="302">Redirect to application home after signout</response>
         [HttpGet("[action]")]
         public async Task<IActionResult> SignOut()
         {

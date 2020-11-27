@@ -9,6 +9,9 @@ using Influunt.Feed.Entity;
 
 namespace Influunt.Host.Controllers
 {
+    /// <summary>
+    /// Channels api
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -23,6 +26,11 @@ namespace Influunt.Host.Controllers
             _channelService = channelService;
         }
 
+        /// <summary>
+        /// All user channels
+        /// </summary>
+        /// <response code="200">Channels array</response>
+        /// <response code="401">Unauthorize</response>
         [HttpGet]
         public async Task<IEnumerable<FeedChannel>> Get()
         {
@@ -30,6 +38,13 @@ namespace Influunt.Host.Controllers
             return await _channelService.GetUserChannels(user);
         }
 
+
+        /// <summary>
+        /// Get user channel by id
+        /// </summary>
+        /// <param name="id">Channel id</param>
+        /// <response code="200">Channel</response>
+        /// <response code="401">Unauthorize</response>
         [HttpGet("{id}")]
         public async Task<FeedChannel> Get(string id)
         {
@@ -42,6 +57,13 @@ namespace Influunt.Host.Controllers
             return null;
         }
 
+        /// <summary>
+        /// Add channel
+        /// </summary>
+        /// <param name="channel"></param>
+        /// <response code="200">Ok</response>
+        /// <response code="400">Channel validation failed</response>
+        /// <response code="401">Unauthorize</response>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] FeedChannel channel)
         {
@@ -55,6 +77,14 @@ namespace Influunt.Host.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Update channel
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="channel"></param>
+        /// <response code="200">OK</response>
+        /// <response code="400">Channel validation failed</response>
+        /// <response code="401">Unauthorize</response>
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(string id, [FromBody] FeedChannel channel)
         {
@@ -75,6 +105,10 @@ namespace Influunt.Host.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Delete channel by id
+        /// </summary>
+        /// <param name="id"></param>
         [HttpDelete("{id}")]
         public async Task Delete(string id)
         {

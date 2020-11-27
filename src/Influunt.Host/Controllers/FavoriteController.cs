@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Influunt.Host.Controllers
 {
+    /// <summary>
+    /// Favorites api
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
@@ -21,7 +24,11 @@ namespace Influunt.Host.Controllers
             _favoriteFeedService = favoriteFeedService;
         }
 
-        // GET: api/Favorite
+        /// <summary>
+        /// Get Favorites
+        /// </summary>
+        /// <response code="200">Favorites</response>
+        /// <response code="401">Unauthorize</response>
         [HttpGet]
         public async Task<IEnumerable<FavoriteFeedItem>> Get()
         {
@@ -30,6 +37,11 @@ namespace Influunt.Host.Controllers
         }
 
         // POST: api/Favorite
+        /// <summary>
+        /// Add feed to favorites
+        /// </summary>
+        /// <param name="feedItem"></param>
+        /// <response code="401">Unauthorize</response>
         [HttpPost]
         public async Task Post([FromBody] FeedItem feedItem)
         {
@@ -38,6 +50,11 @@ namespace Influunt.Host.Controllers
         }
 
         // DELETE: api/Favorite/5
+        /// <summary>
+        /// Delete favorite by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <response code="401">Unauthorize</response>
         [HttpDelete("{id}")]
         public async Task Delete(string id)
         {

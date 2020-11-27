@@ -1,7 +1,6 @@
-﻿using System.Collections;
+﻿using Influunt.Feed.Entity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Influunt.Feed.Entity;
 
 namespace Influunt.Feed
 {
@@ -14,6 +13,8 @@ namespace Influunt.Feed
         /// Получение ленты пользователя
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
         /// <returns></returns>
         Task<IEnumerable<FeedItem>> GetFeed(User user, int? offset = null, int count = 10);
 
@@ -22,6 +23,8 @@ namespace Influunt.Feed
         /// </summary>
         /// <param name="user"></param>
         /// <param name="channel"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
         /// <returns></returns>
         Task<IEnumerable<FeedItem>> GetFeed(User user, FeedChannel channel, int? offset = null, int count = 10);
     }

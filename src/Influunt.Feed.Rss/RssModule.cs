@@ -18,7 +18,7 @@ namespace Influunt.Feed.Rss
         public static IServiceCollection AddRssModule(this IServiceCollection services,
             IRssFeedServiceConfiguration configuration)
         {
-            services.AddSingleton<IRssFeedServiceConfiguration>(configuration);
+            services.AddSingleton(configuration);
             return services.AddRssModule();
         }
 

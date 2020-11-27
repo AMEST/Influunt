@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using Influunt.Feed.Rss;
 using Influunt.MongoStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -11,14 +13,18 @@ using Microsoft.AspNetCore.SpaServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using VueCliMiddleware;
 
 namespace Influunt.Host
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IHostEnvironment _env;
+
+        public Startup(IHostEnvironment env, IConfiguration configuration)
         {
+            _env = env;
             Configuration = configuration;
         }
 
@@ -57,6 +63,19 @@ namespace Influunt.Host
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            services
+                .AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new OpenApiInfo
+                    {
+                        Version = "v1",
+                        Title = "Influunt API",
+                        Description = "Influunt (Rss agregator) Api"
+                    });
+                    c.CustomSchemaIds(type => type.FullName);
+                    c.IncludeXmlComments($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_env.ApplicationName}.xml");
+
+                });
             //AddModules
 
             var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<MongoStorageConfiguration>();
@@ -79,6 +98,11 @@ namespace Influunt.Host
             app.UseForwardedHeaders(forwardedHeadersOptions);
             if (env.IsDevelopment())
             {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Influunt API");
+                });
                 app.UseDeveloperExceptionPage();
             }
 
