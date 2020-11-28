@@ -17,11 +17,18 @@ In order to use the service, you need to log in (so that the user can add his ch
 1. Favorites (add/remove)
 1. Channels (add/edit/change visible in feed/remove)
 1. PWA functional with offline mode (request caching)
+1. Automatic background update of news feed to cache for active accounts
 
 ### Self-hosted Requirements
 * MongoDB - For storing user data (channels, favorites) and for aspnet core secure storage.
 * AspNet Core 3.1 runtime or Docker for service start
 * Optional reverse proxy for https connection
+
+### Screenshots
+![Welcome](https://i.postimg.cc/TPkkZRgs/2020-11-28-12-37-08-localhost-06e95107c6d2.png)
+![Feed](https://i.postimg.cc/nzg3h0dY/2020-11-28-12-37-48-localhost-2ef2932fe865.png)
+![Favorites](https://i.postimg.cc/D0GBJLHV/2020-11-28-12-38-42-localhost-0a8741ba7b25.png)
+![Channels](https://i.postimg.cc/DZ8Chtcw/2020-11-28-12-39-08-localhost-6a9aac0b8b54.png)
 
 ### Using in docker
 

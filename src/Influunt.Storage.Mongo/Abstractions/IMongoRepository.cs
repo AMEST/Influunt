@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Influunt.MongoStorage.Abstractions
+namespace Influunt.Storage.Mongo.Abstractions
 {
     public interface IMongoRepository<TEntity> where TEntity : class
     {

@@ -5,7 +5,7 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Influunt.MongoStorage
+namespace Influunt.Storage.Mongo
 {
     public class EntityMapClass<TClass> : BsonClassMap<TClass>
     {

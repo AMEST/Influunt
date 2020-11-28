@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace Influunt.MongoStorage.DataProtection
+namespace Influunt.Storage.DataProtection
 {
     internal static class DataProtectionStorageExtensions
     {

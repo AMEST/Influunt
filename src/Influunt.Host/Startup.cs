@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Influunt.Feed.Rss;
-using Influunt.MongoStorage;
+using Influunt.Storage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Builder;
@@ -80,8 +80,8 @@ namespace Influunt.Host
 
             var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<MongoStorageConfiguration>();
             services.AddRssModule(Configuration.GetSection("FeedService"));
-            services.AddMongoStorage(storageCfg);
-            services.AddMongoDataProtection();
+            services.AddStorage(storageCfg);
+            services.AddDataProtectionStore();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

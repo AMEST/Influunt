@@ -1,9 +1,9 @@
-﻿using Influunt.MongoStorage.Abstractions;
+﻿using Influunt.Storage.Mongo.Abstractions;
 using MongoDB.Driver;
 
-namespace Influunt.MongoStorage
+namespace Influunt.Storage.Mongo
 {
-    internal class MongoDbContext: IMongoDbContext
+    public class MongoDbContext: IMongoDbContext
     {
         private IMongoDatabase Db { get; set; }
         private MongoClient MongoClient { get; set; }

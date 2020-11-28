@@ -1,6 +1,6 @@
 ﻿using Influunt.Feed.Entity;
 
-namespace Influunt.MongoStorage.DataProtection
+namespace Influunt.Storage.DataProtection
 {
     internal class DbXmlKey : IHasId
     {

@@ -5,11 +5,13 @@ VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Influunt.Host", "src\Influunt.Host\Influunt.Host.csproj", "{D5232164-9233-4B32-8022-75799161F113}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Influunt.Feed", "src\Influunt.Feed\Influunt.Feed.csproj", "{82E2087D-00F6-47A4-90DE-47BFAF40DF39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Influunt.Feed", "src\Influunt.Feed\Influunt.Feed.csproj", "{82E2087D-00F6-47A4-90DE-47BFAF40DF39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Influunt.MongoStorage", "src\Influunt.MongoStorage\Influunt.MongoStorage.csproj", "{9F87FB47-0B6A-435A-BC52-5AE6AC25245C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Influunt.Storage", "src\Influunt.Storage\Influunt.Storage.csproj", "{9F87FB47-0B6A-435A-BC52-5AE6AC25245C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Influunt.Feed.Rss", "src\Influunt.Feed.Rss\Influunt.Feed.Rss.csproj", "{C8997ACE-506F-470F-8BD5-EC955BE522E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Influunt.Feed.Rss", "src\Influunt.Feed.Rss\Influunt.Feed.Rss.csproj", "{C8997ACE-506F-470F-8BD5-EC955BE522E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Influunt.Storage.Mongo", "src\Influunt.Storage.Mongo\Influunt.Storage.Mongo.csproj", "{A4BF604F-C7D7-4D3D-B069-D72CF7E050D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{C8997ACE-506F-470F-8BD5-EC955BE522E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8997ACE-506F-470F-8BD5-EC955BE522E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8997ACE-506F-470F-8BD5-EC955BE522E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4BF604F-C7D7-4D3D-B069-D72CF7E050D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4BF604F-C7D7-4D3D-B069-D72CF7E050D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4BF604F-C7D7-4D3D-B069-D72CF7E050D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4BF604F-C7D7-4D3D-B069-D72CF7E050D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

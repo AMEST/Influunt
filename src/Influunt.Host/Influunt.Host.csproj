@@ -27,16 +27,16 @@
     <PackageReference Include="VueCliMiddleware" Version="3.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.5.1"/>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.5.1"/>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="5.5.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="5.5.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.5.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.5.1"/>
+    <PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="5.5.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Influunt.Feed.Rss\Influunt.Feed.Rss.csproj" />
     <ProjectReference Include="..\Influunt.Feed\Influunt.Feed.csproj" />
-    <ProjectReference Include="..\Influunt.MongoStorage\Influunt.MongoStorage.csproj" />
+    <ProjectReference Include="..\Influunt.Storage\Influunt.Storage.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.Development.json">

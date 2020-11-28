@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.DataProtection.Repositories;
 using Microsoft.Extensions.Options;
 
-namespace Influunt.MongoStorage.DataProtection
+namespace Influunt.Storage.DataProtection
 {
     internal class DataProtectionOptionsConfigurator : IConfigureOptions<KeyManagementOptions>
     {
