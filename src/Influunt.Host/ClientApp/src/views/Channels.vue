@@ -42,7 +42,7 @@
       class="alert-position">
         {{ this.alert.text }}
       </b-alert>
-      <LoadingBar v-if="this.isLoading" icon="sync" text="Loading channels"/>
+      <LoadingBar v-if="this.isLoading" icon="sync" text="Loading channels" spin="true"/>
   </div>
 </template>
 <script>
