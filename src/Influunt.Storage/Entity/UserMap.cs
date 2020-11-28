@@ -1,7 +1,8 @@
 ﻿using System;
 using Influunt.Feed.Entity;
+using Influunt.Storage.Mongo;
 
-namespace Influunt.MongoStorage.Entity
+namespace Influunt.Storage.Entity
 {
     public class UserMap: EntityMapClass<User>
     {

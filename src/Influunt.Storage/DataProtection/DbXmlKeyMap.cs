@@ -1,8 +1,9 @@
-﻿using MongoDB.Bson;
+﻿using Influunt.Storage.Mongo;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Bson.Serialization.Serializers;
 
-namespace Influunt.MongoStorage.DataProtection
+namespace Influunt.Storage.DataProtection
 {
     internal class DbXmlKeyMap : EntityMapClass<DbXmlKey>
     {

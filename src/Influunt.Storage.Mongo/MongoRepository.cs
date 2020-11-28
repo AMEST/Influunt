@@ -1,11 +1,11 @@
-﻿using Influunt.Feed.Entity;
-using Influunt.MongoStorage.Abstractions;
-using MongoDB.Driver;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Influunt.Feed.Entity;
+using Influunt.Storage.Mongo.Abstractions;
+using MongoDB.Driver;
 
-namespace Influunt.MongoStorage
+namespace Influunt.Storage.Mongo
 {
     internal class MongoRepository<TEntity> : IMongoRepository<TEntity> where TEntity : class, IHasId
     {

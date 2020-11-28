@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Influunt.Feed;
 using Influunt.Feed.Entity;
-using Influunt.MongoStorage.Abstractions;
+using Influunt.Storage.Mongo.Abstractions;
 using Microsoft.AspNetCore.Http;
 using MongoDB.Bson;
 
-namespace Influunt.MongoStorage.Services
+namespace Influunt.Storage.Services
 {
     public class UserService: IUserService
     {

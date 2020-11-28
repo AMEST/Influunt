@@ -1,6 +1,6 @@
-﻿using Influunt.MongoStorage.Abstractions;
+﻿using Influunt.Storage.Mongo.Abstractions;
 
-namespace Influunt.MongoStorage
+namespace Influunt.Storage
 {
     public class MongoStorageConfiguration : IMongoStorageConfiguration
     {

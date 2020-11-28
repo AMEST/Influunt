@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 
-namespace Influunt.MongoStorage.Abstractions
+namespace Influunt.Storage.Mongo.Abstractions
 {
     public interface IMongoDbContext
     {

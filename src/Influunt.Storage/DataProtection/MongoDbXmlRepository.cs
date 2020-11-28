@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using Influunt.MongoStorage.Abstractions;
+using Influunt.Storage.Mongo.Abstractions;
 using Microsoft.AspNetCore.DataProtection.Repositories;
 
-namespace Influunt.MongoStorage.DataProtection
+namespace Influunt.Storage.DataProtection
 {
     internal class MongoDbXmlRepository : IXmlRepository
     {
