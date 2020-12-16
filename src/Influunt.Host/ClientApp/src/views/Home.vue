@@ -66,7 +66,7 @@ export default {
             self.feed.push(element)
         });
         if(feedNews.length > 2 && pushCounter < 2)
-          self.scrollMax = feed.scrollHeight - 200
+          self.scrollMax = self.scrollMax - 200
 
         self.isLoading = false
       },offset, channel)
@@ -106,7 +106,7 @@ export default {
             self.feed.push(element)
         });
         if(feedNews.length > 2 && pushCounter < 2)
-          self.scrollMax = feed.scrollHeight - 200
+          self.scrollMax = self.scrollMax - 200
         self.isLoading = false
       },this.offset, channel)
     }

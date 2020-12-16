@@ -17,7 +17,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 window.addEventListener('beforeinstallprompt', function (event) {
   if ((window.localStorage.installPrompt === undefined) || (window.localStorage.installPrompt === 'undefined')) {
     window.localStorage.installPrompt = 'success'
-    console.log('[beforeinstallprompt]', 'prompt')
     event.prompt()
   }
 })
