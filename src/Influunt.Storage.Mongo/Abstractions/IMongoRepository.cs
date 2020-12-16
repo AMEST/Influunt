@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Influunt.Storage.Mongo.Abstractions
@@ -9,6 +10,6 @@ namespace Influunt.Storage.Mongo.Abstractions
         void Update(TEntity obj);
         void Delete(string id);
         Task<TEntity> Get(string id);
-        Task<IEnumerable<TEntity>> Get();
+        IQueryable<TEntity> GetAll();
     }
 }

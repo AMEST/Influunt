@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Influunt.Feed.Entity;
+using Influunt.Host.ViewModels;
 
 namespace Influunt.Host.Controllers
 {
@@ -32,10 +33,10 @@ namespace Influunt.Host.Controllers
         /// <response code="200">Channels array</response>
         /// <response code="401">Unauthorize</response>
         [HttpGet]
-        public async Task<IEnumerable<FeedChannel>> Get()
+        public async Task<IEnumerable<FeedChannelViewModel>> Get()
         {
             var user = await _userService.GetCurrentUser();
-            return await _channelService.GetUserChannels(user);
+            return (await _channelService.GetUserChannels(user)).ToModel();
         }
 
 
@@ -46,12 +47,12 @@ namespace Influunt.Host.Controllers
         /// <response code="200">Channel</response>
         /// <response code="401">Unauthorize</response>
         [HttpGet("{id}")]
-        public async Task<FeedChannel> Get(string id)
+        public async Task<FeedChannelViewModel> Get(string id)
         {
             var user = await _userService.GetCurrentUser();
             var channel = await _channelService.Get(id);
             if (channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
-                return channel;
+                return channel.ToModel();
 
             Response.StatusCode = (int) HttpStatusCode.Forbidden;
             return null;
@@ -65,14 +66,15 @@ namespace Influunt.Host.Controllers
         /// <response code="400">Channel validation failed</response>
         /// <response code="401">Unauthorize</response>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] FeedChannel channel)
+        public async Task<IActionResult> Post([FromBody] FeedChannelViewModel channel)
         {
             var user = await _userService.GetCurrentUser();
             if (!ValidateChannel(channel))
                 return BadRequest();
 
-            channel.UserId = user.Id;
-            await _channelService.Add(channel);
+            var channelEntity = channel.ToEntity();
+            channelEntity.UserId = user.Id;
+            await _channelService.Add(channelEntity);
 
             return Ok();
         }
@@ -86,7 +88,7 @@ namespace Influunt.Host.Controllers
         /// <response code="400">Channel validation failed</response>
         /// <response code="401">Unauthorize</response>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(string id, [FromBody] FeedChannel channel)
+        public async Task<IActionResult> Put(string id, [FromBody] FeedChannelViewModel channel)
         {
             var user = await _userService.GetCurrentUser();
             if (!ValidateChannel(channel))
@@ -98,10 +100,11 @@ namespace Influunt.Host.Controllers
                 Response.StatusCode = (int) HttpStatusCode.Forbidden;
                 return BadRequest();
             }
+            var channelEntity = channel.ToEntity();
 
-            channel.Id = channelInStore.Id;
-            channel.UserId = channelInStore.UserId;
-            await _channelService.Update(user, channel);
+            channelEntity.Id = channelInStore.Id;
+            channelEntity.UserId = channelInStore.UserId;
+            await _channelService.Update(user, channelEntity);
             return Ok();
         }
 
@@ -117,7 +120,7 @@ namespace Influunt.Host.Controllers
             await _channelService.Remove(user, channel);
         }
 
-        private static bool ValidateChannel(FeedChannel channel)
+        private static bool ValidateChannel(FeedChannelViewModel channel)
         {
             if (string.IsNullOrWhiteSpace(channel.Name)
                 || string.IsNullOrWhiteSpace(channel.Url)

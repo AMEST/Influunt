@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Influunt.Host.ViewModels;
 
 namespace Influunt.Host.Controllers
 {
@@ -30,10 +31,10 @@ namespace Influunt.Host.Controllers
         /// <response code="200">Favorites</response>
         /// <response code="401">Unauthorize</response>
         [HttpGet]
-        public async Task<IEnumerable<FavoriteFeedItem>> Get()
+        public async Task<IEnumerable<FavoriteFeedItemViewModel>> Get()
         {
             var user = await _userService.GetCurrentUser();
-            return await _favoriteFeedService.GetUserFavorites(user);
+            return (await _favoriteFeedService.GetUserFavorites(user)).ToModel();
         }
 
         // POST: api/Favorite
@@ -43,10 +44,10 @@ namespace Influunt.Host.Controllers
         /// <param name="feedItem"></param>
         /// <response code="401">Unauthorize</response>
         [HttpPost]
-        public async Task Post([FromBody] FeedItem feedItem)
+        public async Task Post([FromBody] FeedItemViewModel feedItem)
         {
             var user = await _userService.GetCurrentUser();
-            await _favoriteFeedService.Add(user, feedItem);
+            await _favoriteFeedService.Add(user, feedItem.ToEntity());
         }
 
         // DELETE: api/Favorite/5

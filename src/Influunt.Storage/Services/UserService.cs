@@ -24,7 +24,7 @@ namespace Influunt.Storage.Services
 
         public async Task<IEnumerable<User>> GetUsers()
         {
-            return await _userRepository.Get();
+            return await Task.Run(() => _userRepository.GetAll().ToList());
         }
 
         public async Task<User> GetCurrentUser()
@@ -50,7 +50,7 @@ namespace Influunt.Storage.Services
 
         public async Task<User> GetUserByEmail(string email)
         {
-            var user = (await GetUsers()).SingleOrDefault(u => u?.Email?.ToLower() == email?.ToLower());
+            var user = await Task.Run(()=>_userRepository.GetAll().SingleOrDefault(u => u.Email.ToLower() == email.ToLower()));
             return user;
         }
 

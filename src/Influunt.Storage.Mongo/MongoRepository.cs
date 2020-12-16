@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Influunt.Feed.Entity;
 using Influunt.Storage.Mongo.Abstractions;
@@ -48,10 +49,9 @@ namespace Influunt.Storage.Mongo
             return await _dbCollection.FindAsync(filter).Result.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<TEntity>> Get()
+        public IQueryable<TEntity> GetAll()
         {
-            var all = await _dbCollection.FindAsync(Builders<TEntity>.Filter.Empty);
-            return await all.ToListAsync();
+            return _dbCollection.AsQueryable();
         }
     }
 }

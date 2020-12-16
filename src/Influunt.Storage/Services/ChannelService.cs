@@ -49,9 +49,9 @@ namespace Influunt.Storage.Services
             return Task.CompletedTask;
         }
 
-        public async Task<IEnumerable<FeedChannel>> GetUserChannels(User user)
+        public Task<IEnumerable<FeedChannel>> GetUserChannels(User user)
         {
-            return (await _channelRepository.Get()).Where(c => c.UserId == user.Id);
+            return Task.Run(() => _channelRepository.GetAll().Where(c => c.UserId == user.Id).ToList().AsEnumerable());
         }
     }
 }
