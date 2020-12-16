@@ -11,7 +11,7 @@
     <div v-for="(item, key) in this.feed" v-bind:key="key">
       <FeedItem v-bind:title="item.title" v-bind:description="item.description" v-bind:date="item.date" v-bind:link="item.link" v-bind:channel="item.channelName"/>
     </div>
-    <LoadingBar v-if="this.isLoading" icon="sync" text="Loading feed" spin="true"/>
+    <LoadingBar v-if="this.isLoading" icon="sync" text="Loading feed" :spin="true"/>
     <ErrorBar v-if="this.isError" text="Error when loading feed" buttonText="Try reload feed" @onErrorButton="TryLoadAfterError"/>
   </div>
 </template>
@@ -60,9 +60,14 @@ export default {
           var dateB = new Date(b.date)
           return dateA < dateB
         }).reverse()
+        var pushCounter = 0;
         feedNews.forEach(element => {
-          self.feed.push(element)
+          if(!self.feed.some(x => x.itemHash === element.itemHash))
+            self.feed.push(element)
         });
+        if(feedNews.length > 2 && pushCounter < 2)
+          self.scrollMax = feed.scrollHeight - 200
+
         self.isLoading = false
       },offset, channel)
     },
@@ -95,9 +100,13 @@ export default {
           var dateB = new Date(b.date)
           return dateB - dateA
         })
+        var pushCounter = 0;
         feedNews.forEach(element => {
-          self.feed.push(element)
+          if(!self.feed.some(x => x.itemHash === element.itemHash))
+            self.feed.push(element)
         });
+        if(feedNews.length > 2 && pushCounter < 2)
+          self.scrollMax = feed.scrollHeight - 200
         self.isLoading = false
       },this.offset, channel)
     }

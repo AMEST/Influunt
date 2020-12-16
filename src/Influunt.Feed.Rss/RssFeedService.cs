@@ -57,7 +57,9 @@ namespace Influunt.Feed.Rss
             foreach (var task in taskList)
             {
                 feed.AddRange(task.Result);
+                task.Dispose();
             }
+            taskList.Clear();
 
             _logger.LogDebug($"Elapsed time for getting user ({user.Id}) feed: {sw.Elapsed.TotalMilliseconds}ms");
             feed = feed.OrderBy(f => 
@@ -73,7 +75,7 @@ namespace Influunt.Feed.Rss
             if (remainingElements < count)
                 return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
                     remainingElements < 0 ? 0 : remainingElements);
-
+            
             return feed.GetRange(offset.Value, count);
 
         }

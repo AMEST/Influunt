@@ -9,7 +9,7 @@ using MongoDB.Bson;
 
 namespace Influunt.Storage.Services
 {
-    public class FavoriteService: IFavoriteFeedService
+    public class FavoriteService : IFavoriteFeedService
     {
         private readonly IMongoRepository<FavoriteFeedItem> _favoriteRepository;
 
@@ -37,15 +37,15 @@ namespace Influunt.Storage.Services
         public async Task Remove(User user, string id)
         {
             var favorite = await _favoriteRepository.Get(id);
-            if(favorite == null || !favorite.UserId.Equals(user.Id,StringComparison.OrdinalIgnoreCase))
+            if (favorite == null || !favorite.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return;
-            
+
             _favoriteRepository.Delete(favorite.Id);
         }
 
-        public async Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user)
+        public Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user)
         {
-            return (await _favoriteRepository.Get()).Where(f => f.UserId == user.Id);
+            return Task.Run(() => _favoriteRepository.GetAll().Where(f => f.UserId == user.Id).ToList().AsEnumerable());
         }
     }
 }

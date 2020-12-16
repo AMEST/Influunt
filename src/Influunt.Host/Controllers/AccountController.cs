@@ -4,6 +4,7 @@ using Influunt.Feed;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Influunt.Feed.Entity;
+using Influunt.Host.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -29,12 +30,12 @@ namespace Influunt.Host.Controllers
         /// </summary>
         /// <response code="200">User profile</response>
         [HttpGet("current")]
-        [ProducesResponseType(typeof(User),200)]
+        [ProducesResponseType(typeof(UserViewModel),200)]
         public async Task<IActionResult> CurrentUser()
         {
             var user = await _userService.GetCurrentUser();
 
-            return new JsonResult(user);
+            return new JsonResult(user.ToModel());
         }
 
         /// <summary>

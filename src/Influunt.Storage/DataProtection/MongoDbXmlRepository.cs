@@ -17,7 +17,7 @@ namespace Influunt.Storage.DataProtection
 
         public IReadOnlyCollection<XElement> GetAllElements()
         {
-            var keys = _keys.Get().GetAwaiter().GetResult();
+            var keys = _keys.GetAll().ToList();
             return keys.Select(key => key.ToKeyXmlElement()).ToList();
         }
 

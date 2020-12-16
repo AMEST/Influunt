@@ -1,5 +1,5 @@
 ﻿using Influunt.Feed;
-using Influunt.Feed.Entity;
+using Influunt.Host.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -33,10 +33,10 @@ namespace Influunt.Host.Controllers
         /// <response code="200">Feed</response>
         /// <response code="401">Unauthorize</response>
         [HttpGet]
-        public async Task<IEnumerable<FeedItem>> Get([FromQuery] int? offset)
+        public async Task<IEnumerable<FeedItemViewModel>> Get([FromQuery] int? offset)
         {
             var user = await _userService.GetCurrentUser();
-            return await _feedService.GetFeed(user, offset);
+            return (await _feedService.GetFeed(user, offset)).ToModel();
         }
 
         // GET: api/Feed/5
@@ -48,11 +48,11 @@ namespace Influunt.Host.Controllers
         /// <response code="200">Feed</response>
         /// <response code="401">Unauthorize</response>
         [HttpGet("{id}")]
-        public async Task<IEnumerable<FeedItem>> Get(string id, [FromQuery] int? offset)
+        public async Task<IEnumerable<FeedItemViewModel>> Get(string id, [FromQuery] int? offset)
         {
             var user = await _userService.GetCurrentUser();
             var channel = await _channelService.Get(id);
-            return await _feedService.GetFeed(user, channel, offset);
+            return (await _feedService.GetFeed(user, channel, offset)).ToModel();
         }
     }
 }
