@@ -3,14 +3,21 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/amest/influunt)
 ![GitHub](https://img.shields.io/github/license/amest/influunt)
 # Influunt - rss agregator 
-### Links
+- [Influunt - rss agregator](#influunt---rss-agregator)
+  - [Links](#links)
+  - [Description](#description)
+  - [Features](#features)
+  - [Self-hosted Requirements](#self-hosted-requirements)
+  - [Screenshots](#screenshots)
+  - [Using in docker](#using-in-docker)
+## Links
 * **[Try Influunt](https://influunt.tk)**  
 * **[Influunt docker image](https://hub.docker.com/r/eluki/influunt)**
-### Description
+## Description
 Simple aggregator of rss news feeds. Implements a single news feed, with the ability to save posts to favorites, for further reading or as a note about an interesting article.   
 In order to use the service, you need to log in (so that the user can add his channels and refer to selected articles). Authorization via Google is implemented as standard, but if the self hosted option does not suit you, you can safely replace it with another provider.   
 
-### Features
+## Features
 1. Authorization: Google and Guest (for try service or local / self-hosted using)
 1. Infinite news feed (while has news inside channels)
 1. Receiving news feed in parts (10 news)
@@ -19,18 +26,18 @@ In order to use the service, you need to log in (so that the user can add his ch
 1. PWA functional with offline mode (request caching)
 1. Automatic background update of news feed to cache for active accounts
 
-### Self-hosted Requirements
+## Self-hosted Requirements
 * MongoDB - For storing user data (channels, favorites) and for aspnet core secure storage.
 * AspNet Core 3.1 runtime or Docker for service start
 * Optional reverse proxy for https connection
 
-### Screenshots
-|||
-| ------------- |:-------------:|
-|![Welcome](https://i.postimg.cc/TPkkZRgs/2020-11-28-12-37-08-localhost-06e95107c6d2.png)|![Feed](https://i.postimg.cc/nzg3h0dY/2020-11-28-12-37-48-localhost-2ef2932fe865.png)|
-|![Favorites](https://i.postimg.cc/D0GBJLHV/2020-11-28-12-38-42-localhost-0a8741ba7b25.png)|![Channels](https://i.postimg.cc/DZ8Chtcw/2020-11-28-12-39-08-localhost-6a9aac0b8b54.png)|
+## Screenshots
+|                                                                                            |                                                                                           |
+| ------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------: |
+| ![Welcome](https://i.postimg.cc/TPkkZRgs/2020-11-28-12-37-08-localhost-06e95107c6d2.png)   |   ![Feed](https://i.postimg.cc/nzg3h0dY/2020-11-28-12-37-48-localhost-2ef2932fe865.png)   |
+| ![Favorites](https://i.postimg.cc/D0GBJLHV/2020-11-28-12-38-42-localhost-0a8741ba7b25.png) | ![Channels](https://i.postimg.cc/DZ8Chtcw/2020-11-28-12-39-08-localhost-6a9aac0b8b54.png) |
 
-### Using in docker
+## Using in docker
 
 **Docker compose file for swarm mode:**
 ```Dockerfile
