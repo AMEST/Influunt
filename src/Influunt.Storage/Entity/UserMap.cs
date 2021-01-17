@@ -1,6 +1,6 @@
-﻿using System;
-using Influunt.Feed.Entity;
-using Influunt.Storage.Mongo;
+﻿using Influunt.Feed.Entity;
+using Skidbladnir.Repository.MongoDB;
+using System;
 
 namespace Influunt.Storage.Entity
 {

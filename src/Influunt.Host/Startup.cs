@@ -78,10 +78,9 @@ namespace Influunt.Host
                 });
             //AddModules
 
-            var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<MongoStorageConfiguration>();
+            var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<StorageConfiguration>();
             services.AddRssModule(Configuration.GetSection("FeedService"));
             services.AddStorage(storageCfg);
-            services.AddDataProtectionStore();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

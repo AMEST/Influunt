@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Influunt.Feed;
+using Influunt.Feed.Entity;
+using MongoDB.Bson;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Influunt.Feed;
-using Influunt.Feed.Entity;
-using Influunt.Storage.Mongo.Abstractions;
-using MongoDB.Bson;
+using Skidbladnir.Repository.Abstractions;
 
 namespace Influunt.Storage.Services
 {
     public class ChannelService: IChannelService
     {
-        private readonly IMongoRepository<FeedChannel> _channelRepository;
+        private readonly IRepository<FeedChannel> _channelRepository;
 
-        public ChannelService(IMongoRepository<FeedChannel> channelRepository)
+        public ChannelService(IRepository<FeedChannel> channelRepository)
         {
             _channelRepository = channelRepository;
         }

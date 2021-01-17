@@ -1,5 +1,5 @@
 ﻿using Influunt.Feed.Entity;
-using Influunt.Storage.Mongo;
+using Skidbladnir.Repository.MongoDB;
 
 namespace Influunt.Storage.Entity
 {
