@@ -27,7 +27,6 @@ namespace Influunt.Feed.Rss
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             services.AddScoped<IFeedService, RssFeedService>();
             services.AddHostedService<FeedUpdateWorker>();
-            services.AddMemoryCache();
             return services;
         }
     }

@@ -8,7 +8,7 @@ namespace Influunt.Storage.Entity
     {
         public UserMap()
         {
-            ToCollection("users");
+            ToCollection("User");
 
             MapField(f => f.LastActivity)
                 .SetDefaultValue(DateTime.UnixEpoch)

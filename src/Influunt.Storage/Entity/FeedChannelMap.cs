@@ -7,7 +7,7 @@ namespace Influunt.Storage.Entity
     {
         public FeedChannelMap()
         {
-            ToCollection("channels");
+            ToCollection("FeedChannel");
         }
     }
 }

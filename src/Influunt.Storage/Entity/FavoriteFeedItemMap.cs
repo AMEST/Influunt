@@ -7,7 +7,7 @@ namespace Influunt.Storage.Entity
     {
         public FavoriteFeedItemMap()
         {
-            ToCollection("favorite");
+            ToCollection("FavoriteFeedItem");
         }
     }
 }

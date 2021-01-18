@@ -5,6 +5,7 @@ using Influunt.Storage.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
 using Skidbladnir.Repository.MongoDB;
 
@@ -22,6 +23,7 @@ namespace Influunt.Storage
                     builder.AddEntity<FeedChannel, FeedChannelMap>();
                     builder.AddEntity<FavoriteFeedItem, FavoriteFeedItemMap>();
                     builder.UseDataProtection(services);
+                    builder.UseMongoDistributedCache(services);
                 });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
