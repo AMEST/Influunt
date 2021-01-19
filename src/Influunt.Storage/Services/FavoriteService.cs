@@ -1,19 +1,19 @@
-﻿using System;
+﻿using Influunt.Feed;
+using Influunt.Feed.Entity;
+using MongoDB.Bson;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Influunt.Feed;
-using Influunt.Feed.Entity;
-using Influunt.Storage.Mongo.Abstractions;
-using MongoDB.Bson;
+using Skidbladnir.Repository.Abstractions;
 
 namespace Influunt.Storage.Services
 {
     public class FavoriteService : IFavoriteFeedService
     {
-        private readonly IMongoRepository<FavoriteFeedItem> _favoriteRepository;
+        private readonly IRepository<FavoriteFeedItem> _favoriteRepository;
 
-        public FavoriteService(IMongoRepository<FavoriteFeedItem> favoriteRepository)
+        public FavoriteService(IRepository<FavoriteFeedItem> favoriteRepository)
         {
             _favoriteRepository = favoriteRepository;
         }

@@ -19,6 +19,7 @@ namespace Influunt.Host.Controllers
         private readonly IUserService _userService;
         private readonly IFavoriteFeedService _favoriteFeedService;
 
+        /// <inheritdoc />
         public FavoriteController(IUserService userService, IFavoriteFeedService favoriteFeedService)
         {
             _userService = userService;

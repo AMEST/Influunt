@@ -1,5 +1,5 @@
 ﻿using Influunt.Feed.Entity;
-using Influunt.Storage.Mongo;
+using Skidbladnir.Repository.MongoDB;
 
 namespace Influunt.Storage.Entity
 {
@@ -7,7 +7,7 @@ namespace Influunt.Storage.Entity
     {
         public FeedChannelMap()
         {
-            ToCollection("channels");
+            ToCollection("FeedChannel");
         }
     }
 }

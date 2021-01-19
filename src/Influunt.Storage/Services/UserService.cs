@@ -1,21 +1,21 @@
-﻿using System;
+﻿using Influunt.Feed;
+using Influunt.Feed.Entity;
+using Microsoft.AspNetCore.Http;
+using MongoDB.Bson;
+using Skidbladnir.Repository.Abstractions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Influunt.Feed;
-using Influunt.Feed.Entity;
-using Influunt.Storage.Mongo.Abstractions;
-using Microsoft.AspNetCore.Http;
-using MongoDB.Bson;
 
 namespace Influunt.Storage.Services
 {
     public class UserService: IUserService
     {
-        private readonly IMongoRepository<User> _userRepository;
+        private readonly IRepository<User> _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserService(IMongoRepository<User> userRepository, IHttpContextAccessor httpContextAccessor)
+        public UserService(IRepository<User> userRepository, IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
             _httpContextAccessor = httpContextAccessor;

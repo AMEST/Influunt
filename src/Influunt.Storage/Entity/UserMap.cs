@@ -1,6 +1,6 @@
-﻿using System;
-using Influunt.Feed.Entity;
-using Influunt.Storage.Mongo;
+﻿using Influunt.Feed.Entity;
+using Skidbladnir.Repository.MongoDB;
+using System;
 
 namespace Influunt.Storage.Entity
 {
@@ -8,7 +8,7 @@ namespace Influunt.Storage.Entity
     {
         public UserMap()
         {
-            ToCollection("users");
+            ToCollection("User");
 
             MapField(f => f.LastActivity)
                 .SetDefaultValue(DateTime.UnixEpoch)

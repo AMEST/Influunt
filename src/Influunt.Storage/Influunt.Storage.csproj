@@ -10,12 +10,15 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.7" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="3.1.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.11" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="3.1.11" />
+    <PackageReference Include="Skidbladnir.Caching.Distributed.MongoDB" Version="0.0.1-build0003" />
+    <PackageReference Include="Skidbladnir.DataProtection.Abstractions" Version="0.0.1-build0003" />
+    <PackageReference Include="Skidbladnir.DataProtection.MongoDb" Version="0.0.1-build0003" />
+    <PackageReference Include="Skidbladnir.Repository.MongoDB" Version="0.0.1-build0003" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Influunt.Storage.Mongo\Influunt.Storage.Mongo.csproj" />
     <ProjectReference Include="..\Influunt.Feed\Influunt.Feed.csproj" />
   </ItemGroup>
 

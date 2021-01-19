@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Claims;
+using Skidbladnir.Repository.Abstractions;
 
 namespace Influunt.Feed.Entity
 {

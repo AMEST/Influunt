@@ -21,6 +21,7 @@ namespace Influunt.Host.Controllers
         private readonly IUserService _userService;
         private readonly IChannelService _channelService;
 
+        /// <inheritdoc />
         public ChannelController(IUserService userService, IChannelService channelService)
         {
             _userService = userService;

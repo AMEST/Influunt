@@ -20,6 +20,7 @@ namespace Influunt.Host.Controllers
     {
         private readonly IUserService _userService;
 
+        /// <inheritdoc />
         public AccountController(IUserService userService)
         {
             _userService = userService;
