@@ -18,7 +18,8 @@ namespace Influunt.Feed.Rss
         private readonly ILogger<RssFeedService> _logger;
         private readonly HttpClient _rssClient;
 
-        public RssFeedService(IChannelService channelService, IDistributedCache distributedCache, ILogger<RssFeedService> logger)
+        public RssFeedService(IChannelService channelService, IDistributedCache distributedCache,
+            ILogger<RssFeedService> logger)
         {
             _channelService = channelService;
             _distributedCache = distributedCache;
@@ -32,25 +33,10 @@ namespace Influunt.Feed.Rss
             var userChannels = await _channelService.GetUserChannels(user);
             var feed = new List<FeedItem>();
 
-            var taskList = new List<Task<List<FeedItem>>>();
-
-            foreach (var channel in userChannels.Where( c => !c.Hidden))
-            {
-                var channelTask = Task.Run(async () =>
-                {
-                    if (_distributedCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> channelFeed))
-                        return channelFeed;
-
-                    channelFeed = await GetFeedFromChannel(channel);
-                    if (channelFeed.Any())
-                        _distributedCache.Set($"channel_url_{channel.Url}", channelFeed, new DistributedCacheEntryOptions()
-                        {
-                            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-                        });
-                    return channelFeed;
-                });
-                taskList.Add(channelTask);
-            }
+            var taskList = userChannels
+                            .Where(c => !c.Hidden)
+                            .Select(GetFeedFromChannelCached)
+                            .ToList();
 
             await Task.WhenAll(taskList);
 
@@ -59,28 +45,20 @@ namespace Influunt.Feed.Rss
                 var result = task.Result;
                 feed.AddRange(result);
                 result.Clear();
-                
                 task.Dispose();
             }
+
             taskList.Clear();
 
             _logger.LogDebug($"Elapsed time for getting user ({user.Id}) feed: {sw.Elapsed.TotalMilliseconds}ms");
-            feed = feed.OrderBy(f => 
+            feed = feed.OrderBy(f =>
                 string.IsNullOrWhiteSpace(f?.Date)
-                ? DateTime.UtcNow
-                : DateTime.Parse(f.Date)
-                ).ToList();
+                    ? DateTime.UtcNow
+                    : DateTime.Parse(f.Date)
+            ).ToList();
             feed.Reverse();
 
-            if (offset == null) return feed;
-
-            var remainingElements = feed.Count - offset.Value;
-            if (remainingElements < count)
-                return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
-                    remainingElements < 0 ? 0 : remainingElements);
-            
-            return feed.GetRange(offset.Value, count);
-
+            return feed.GetChunckedFeed(offset, count);
         }
 
         public async Task<IEnumerable<FeedItem>> GetFeed(User user, FeedChannel channel, int? offset = null,
@@ -89,23 +67,40 @@ namespace Influunt.Feed.Rss
             if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return new List<FeedItem>();
 
-            if (!_distributedCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> feed))
+            if (_distributedCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> feed))
+                return feed.GetChunckedFeed(offset, count);
+
+            feed = await GetFeedFromChannel(channel);
+            _distributedCache.Set($"channel_url_{channel.Url}", feed, new DistributedCacheEntryOptions()
             {
-                feed = await GetFeedFromChannel(channel);
-                _distributedCache.Set($"channel_url_{channel.Url}", feed, new DistributedCacheEntryOptions()
-                {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-                });
-            }
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+            });
 
-            if (offset == null) return feed;
-            var remainingElements = feed.Count - offset.Value;
-            if (remainingElements < count)
-                return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
-                    remainingElements < 0 ? 0 : remainingElements);
+            return feed.GetChunckedFeed(offset, count);
+        }
 
-            return feed.GetRange(offset.Value, count);
+        public void Dispose()
+        {
+            _rssClient?.Dispose();
+            GC.Collect();
+            GC.SuppressFinalize(this);
+        }
 
+        private Task<List<FeedItem>> GetFeedFromChannelCached(FeedChannel channel)
+        {
+            return Task.Run(async () =>
+            {
+                if (_distributedCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> channelFeed))
+                    return channelFeed;
+
+                channelFeed = await GetFeedFromChannel(channel);
+                if (channelFeed.Any())
+                    _distributedCache.Set($"channel_url_{channel.Url}", channelFeed, new DistributedCacheEntryOptions()
+                    {
+                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                    });
+                return channelFeed;
+            });
         }
 
         private async Task<List<FeedItem>> GetFeedFromChannel(FeedChannel channel)
@@ -116,7 +111,7 @@ namespace Influunt.Feed.Rss
                 using (var xmlRss = await result.Content.ReadAsStreamAsync())
                 {
                     var ser = new XmlSerializer(typeof(RssBody));
-                    var rssBody = (RssBody)ser.Deserialize(xmlRss);
+                    var rssBody = (RssBody) ser.Deserialize(xmlRss);
 
                     return rssBody.Channel.Item.Select(rssItem => new FeedItem
                     {
@@ -135,13 +130,6 @@ namespace Influunt.Feed.Rss
                     channel.Name, channel.Url, e.Message);
                 return new List<FeedItem>();
             }
-        }
-
-        public void Dispose()
-        {
-            _rssClient?.Dispose();
-            GC.Collect();
-            GC.SuppressFinalize(this);
         }
     }
 }

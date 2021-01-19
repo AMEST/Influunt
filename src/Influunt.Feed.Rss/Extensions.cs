@@ -1,10 +1,12 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
+using Influunt.Feed.Entity;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
 namespace Influunt.Feed.Rss
 {
-    public static class CacheExtensions
+    public static class Extensions
     {
         public static bool TryGetValue<TResult>(this IDistributedCache cache, string key, out TResult result)
         {
@@ -26,6 +28,20 @@ namespace Influunt.Feed.Rss
             var serializedEntry = JsonConvert.SerializeObject(entry);
             cache.Set(key, Encoding.UTF8.GetBytes(serializedEntry),options);
             serializedEntry = null;
+        }
+
+
+        public static IEnumerable<FeedItem> GetChunckedFeed(this List<FeedItem> feed, int? offset, int count)
+        {
+            if (offset == null)
+                return feed;
+
+            var remainingElements = feed.Count - offset.Value;
+            if (remainingElements < count)
+                return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
+                    remainingElements < 0 ? 0 : remainingElements);
+
+            return feed.GetRange(offset.Value, count);
         }
     }
 }

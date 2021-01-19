@@ -19,6 +19,7 @@ namespace Influunt.Host.Controllers
         private readonly IFeedService _feedService;
         private readonly IChannelService _channelService;
 
+        /// <inheritdoc />
         public FeedController(IUserService userService, IFeedService feedService, IChannelService channelService)
         {
             _userService = userService;

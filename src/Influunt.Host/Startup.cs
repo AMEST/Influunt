@@ -18,19 +18,31 @@ using VueCliMiddleware;
 
 namespace Influunt.Host
 {
+    /// <summary>
+    /// Startup class
+    /// </summary>
     public class Startup
     {
         private readonly IHostEnvironment _env;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public Startup(IHostEnvironment env, IConfiguration configuration)
         {
             _env = env;
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// Application configuration
+        /// </summary>
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             services
@@ -83,7 +95,9 @@ namespace Influunt.Host
             services.AddStorage(storageCfg);
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// </summary>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             var forwardedHeadersOptions = new ForwardedHeadersOptions

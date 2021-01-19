@@ -4,8 +4,14 @@ using Influunt.Feed.Entity;
 
 namespace Influunt.Host.ViewModels
 {
+    /// <summary>
+    /// Extensions for class mapping
+    /// </summary>
     public static class MappingExtensions
     {
+        /// <summary>
+        /// User to UseViewModel mapping
+        /// </summary>
         public static UserViewModel ToModel(this User user)
         {
             if (user == null)
@@ -18,6 +24,9 @@ namespace Influunt.Host.ViewModels
             };
         }
 
+        /// <summary>
+        /// FeedItem to FeedItemViewModel mapping
+        /// </summary>
         public static IEnumerable<FeedItemViewModel> ToModel(this IEnumerable<FeedItem> feedItem)
         {
             return feedItem.Select(x => new FeedItemViewModel
@@ -30,6 +39,9 @@ namespace Influunt.Host.ViewModels
             });
         }
 
+        /// <summary>
+        /// FeedItemViewModel to FeedItem mapping
+        /// </summary>
         public static FeedItem ToEntity(this FeedItemViewModel feedViewItem)
         {
             return new FeedItem
@@ -42,6 +54,9 @@ namespace Influunt.Host.ViewModels
             };
         }
 
+        /// <summary>
+        /// FavoriteFeedItem to FavoriteFeedItemViewModel mapping
+        /// </summary>
         public static IEnumerable<FavoriteFeedItemViewModel> ToModel(this IEnumerable<FavoriteFeedItem> feedItem)
         {
             return feedItem.Select(x => new FavoriteFeedItemViewModel
@@ -55,6 +70,9 @@ namespace Influunt.Host.ViewModels
             });
         }
 
+        /// <summary>
+        /// FeedChannel to FeedChannelViewModel mapping
+        /// </summary>
         public static IEnumerable<FeedChannelViewModel> ToModel(this IEnumerable<FeedChannel> channelItem)
         {
             return channelItem.Select(x => new FeedChannelViewModel
@@ -66,6 +84,9 @@ namespace Influunt.Host.ViewModels
             });
         }
 
+        /// <summary>
+        /// FeedChannel to FeedChannelViewModel mapping
+        /// </summary>
         public static FeedChannelViewModel ToModel(this FeedChannel channelItem)
         {
             return new FeedChannelViewModel
@@ -77,6 +98,9 @@ namespace Influunt.Host.ViewModels
             };
         }
 
+        /// <summary>
+        /// FeedChannelViewModel to FeedChannel mapping
+        /// </summary>
         public static FeedChannel ToEntity(this FeedChannelViewModel channelItem)
         {
             return new FeedChannel
