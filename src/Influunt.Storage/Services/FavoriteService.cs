@@ -43,9 +43,22 @@ namespace Influunt.Storage.Services
             _favoriteRepository.Delete(favorite.Id);
         }
 
-        public Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user)
+        public Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset)
         {
-            return Task.Run(() => _favoriteRepository.GetAll().Where(f => f.UserId == user.Id).ToList().AsEnumerable());
+            if (offset != null)
+                return Task.Run(() =>
+                    _favoriteRepository.GetAll()
+                        .Where(f => f.UserId == user.Id)
+                        .Skip(offset.Value)
+                        .Take(10)
+                        .ToList()
+                        .AsEnumerable());
+
+            return Task.Run(() =>
+                _favoriteRepository.GetAll()
+                    .Where(f => f.UserId == user.Id)
+                    .ToList()
+                    .AsEnumerable());
         }
     }
 }

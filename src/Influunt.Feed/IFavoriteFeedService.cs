@@ -28,8 +28,6 @@ namespace Influunt.Feed
         /// <summary>
         /// Получение избранных постов пользователя
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user);
+        Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset);
     }
 }
