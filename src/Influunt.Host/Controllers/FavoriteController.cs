@@ -32,10 +32,10 @@ namespace Influunt.Host.Controllers
         /// <response code="200">Favorites</response>
         /// <response code="401">Unauthorize</response>
         [HttpGet]
-        public async Task<IEnumerable<FavoriteFeedItemViewModel>> Get()
+        public async Task<IEnumerable<FavoriteFeedItemViewModel>> Get([FromQuery] int? offset)
         {
             var user = await _userService.GetCurrentUser();
-            return (await _favoriteFeedService.GetUserFavorites(user)).ToModel();
+            return (await _favoriteFeedService.GetUserFavorites(user, offset)).ToModel();
         }
 
         // POST: api/Favorite

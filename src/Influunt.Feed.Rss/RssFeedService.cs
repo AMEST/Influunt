@@ -51,12 +51,7 @@ namespace Influunt.Feed.Rss
             taskList.Clear();
 
             _logger.LogDebug($"Elapsed time for getting user ({user.Id}) feed: {sw.Elapsed.TotalMilliseconds}ms");
-            feed = feed.OrderBy(f =>
-                string.IsNullOrWhiteSpace(f?.Date)
-                    ? DateTime.UtcNow
-                    : DateTime.Parse(f.Date)
-            ).ToList();
-            feed.Reverse();
+            feed = feed.OrderByDescending(f => f.PubDate).ToList();
 
             return feed.GetChunckedFeed(offset, count);
         }
@@ -113,14 +108,21 @@ namespace Influunt.Feed.Rss
                     var ser = new XmlSerializer(typeof(RssBody));
                     var rssBody = (RssBody) ser.Deserialize(xmlRss);
 
-                    return rssBody.Channel.Item.Select(rssItem => new FeedItem
+                    return rssBody.Channel.Item.Select(rssItem =>
                     {
-                        Title = rssItem.Title,
-                        Description = rssItem.Description,
-                        Date = rssItem.PubDate,
-                        Link = rssItem.Link?.ToString(),
-                        ChannelName = channel.Name ?? ""
-                    }.NormalizeDescription()).ToList();
+                        var item = new FeedItem
+                        {
+                            Title = rssItem.Title,
+                            Description = rssItem.Description,
+                            PubDate = DateTime.UtcNow.AddDays(-31),
+                            Link = rssItem.Link?.ToString(),
+                            ChannelName = channel.Name ?? ""
+                        };
+                        if (DateTime.TryParse(rssItem.PubDate, out var pubDate))
+                            item.PubDate = pubDate;
+
+                        return item.NormalizeDescription();
+                    }).ToList();
                 }
             }
             catch (Exception e)

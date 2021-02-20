@@ -32,7 +32,7 @@ namespace Influunt.Host.ViewModels
             return feedItem.Select(x => new FeedItemViewModel
             {
                 ChannelName = x.ChannelName,
-                Date = x.Date,
+                Date = x.PubDate,
                 Description = x.Description,
                 Link = x.Link,
                 Title = x.Title
@@ -47,7 +47,7 @@ namespace Influunt.Host.ViewModels
             return new FeedItem
             {
                 ChannelName = feedViewItem.ChannelName,
-                Date = feedViewItem.Date,
+                PubDate = feedViewItem.Date,
                 Description = feedViewItem.Description,
                 Link = feedViewItem.Link,
                 Title = feedViewItem.Title
@@ -62,7 +62,7 @@ namespace Influunt.Host.ViewModels
             return feedItem.Select(x => new FavoriteFeedItemViewModel
             {
                 ChannelName = x.ChannelName,
-                Date = x.Date,
+                Date = x.PubDate,
                 Description = x.Description,
                 Link = x.Link,
                 Title = x.Title,

@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace Influunt.Feed.Entity
@@ -8,7 +9,7 @@ namespace Influunt.Feed.Entity
         public string Title { get; set; }
         public string Link { get; set; }
         public string Description { get; set; }
-        public string Date { get; set; }
+        public DateTime PubDate { get; set; }
         public string ChannelName { get; set; }
 
         public FeedItem NormalizeDescription()
