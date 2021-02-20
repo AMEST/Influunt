@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Influunt.Feed.Entity;
 using Microsoft.Extensions.Caching.Distributed;
@@ -31,17 +32,9 @@ namespace Influunt.Feed.Rss
         }
 
 
-        public static IEnumerable<FeedItem> GetChunckedFeed(this List<FeedItem> feed, int? offset, int count)
+        public static IEnumerable<FeedItem> GetChunckedFeed(this IEnumerable<FeedItem> feed, int? offset, int count)
         {
-            if (offset == null)
-                return feed;
-
-            var remainingElements = feed.Count - offset.Value;
-            if (remainingElements < count)
-                return feed.GetRange(offset.Value <= feed.Count ? offset.Value : feed.Count,
-                    remainingElements < 0 ? 0 : remainingElements);
-
-            return feed.GetRange(offset.Value, count);
+            return offset == null ? feed : feed.Skip(offset.Value).Take(count);
         }
     }
 }

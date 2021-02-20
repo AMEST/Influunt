@@ -5,6 +5,7 @@ using Influunt.Storage.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoDB.Bson.Serialization.Conventions;
 using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
 using Skidbladnir.Repository.MongoDB;
@@ -16,6 +17,16 @@ namespace Influunt.Storage
         public static IServiceCollection AddStorage(this IServiceCollection services,
             StorageConfiguration configuration)
         {
+            // Register conventions
+            var pack = new ConventionPack
+            {
+                new IgnoreIfDefaultConvention(true),
+                new IgnoreExtraElementsConvention(true),
+            };
+
+            ConventionRegistry.Register("Influunt", pack, t => true);
+
+            //Database
             services.AddMongoDbContext(builder =>
                 {
                     builder.UseConnectionString(configuration.ConnectionString);
@@ -28,6 +39,7 @@ namespace Influunt.Storage
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            //Services
             services.AddSingleton<IUserService, UserService>();
             services.AddScoped<IChannelService, ChannelService>();
             services.AddScoped<IFavoriteFeedService, FavoriteService>();

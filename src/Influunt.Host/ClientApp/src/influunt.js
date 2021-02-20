@@ -70,9 +70,15 @@ var InfluuntApi = {
         }
         request.send(JSON.stringify(data))
     },
-    GetFavorite: function(callback = (request) => { }){
+    GetFavorite: function(callback = (request) => { }, offset = null){
+        console.log("[Offset]",offset)
+        var url = "/api/favorite"
+
+        if(offset != null)
+            url +="?offset="+offset
+
         var request = new XMLHttpRequest()
-        request.open("GET", "/api/favorite")
+        request.open("GET", url)
         request.onload = function () {
             callback(request)
         }

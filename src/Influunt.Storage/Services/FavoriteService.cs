@@ -22,7 +22,7 @@ namespace Influunt.Storage.Services
         {
             var favoriteItem = new FavoriteFeedItem
             {
-                Date = favorite.Date,
+                PubDate = favorite.PubDate,
                 Description = favorite.Description,
                 Link = favorite.Link,
                 Title = favorite.Title,
@@ -45,20 +45,19 @@ namespace Influunt.Storage.Services
 
         public Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset)
         {
-            if (offset != null)
-                return Task.Run(() =>
-                    _favoriteRepository.GetAll()
-                        .Where(f => f.UserId == user.Id)
-                        .Skip(offset.Value)
-                        .Take(10)
-                        .ToList()
-                        .AsEnumerable());
+            return Task.Run(() => GetFavorites(user,offset).ToList().AsEnumerable());
+        }
 
-            return Task.Run(() =>
-                _favoriteRepository.GetAll()
-                    .Where(f => f.UserId == user.Id)
-                    .ToList()
-                    .AsEnumerable());
+        private IQueryable<FavoriteFeedItem> GetFavorites(User user, int? offset)
+        {
+            var query = _favoriteRepository.GetAll()
+                .Where(f => f.UserId == user.Id)
+                .OrderByDescending(f => f.PubDate);
+
+            if (offset == null)
+                return query;
+
+            return query.Skip(offset.Value).Take(10);
         }
     }
 }

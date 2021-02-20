@@ -1,5 +1,5 @@
 <template>
-  <div class="favorite enable-scroll" id="feed">
+  <div class="favorite enable-scroll" id="favorite-feed">
     <b-row v-if="this.feed.length == 0" class="h-max align-items-center">
       <b-col class="text-center">
         <b-icon icon="star-fill" variant="warning" font-scale="7.5"/>
@@ -27,24 +27,53 @@ name: 'favorite',
   data: function(){
     return {
       feed:[],
+      scrollMax: 0,
+      offset:0,
       isLoading: false
     }
   },
-  created: function(){
+  methods:{
+    InfinityFeed: function(offset){
+      var self = this
+      this.isLoading = true
+
+      InfluuntApi.GetFavorite(function(request){
+        var favoriteFeed = JSON.parse(request.response)
+        favoriteFeed = favoriteFeed.sort(function (a, b) {
+          var dateA = new Date(a.date)
+          var dateB = new Date(b.date)
+          return dateA < dateB
+        })
+        favoriteFeed.forEach(element => {
+          self.feed.push(element)
+        });
+        self.isLoading = false
+      }, offset)
+    },
+  },
+  mounted: function(){
     var self = this
-    this.isLoading = true
-    InfluuntApi.GetFavorite(function(request){
-      var favoriteFeed = JSON.parse(request.response)
-      favoriteFeed = favoriteFeed.sort(function (a, b) {
-        var dateA = new Date(a.date)
-        var dateB = new Date(b.date)
-        return dateA < dateB
-      }).reverse()
-      favoriteFeed.forEach(element => {
-        self.feed.push(element)
+    var feed = document.getElementById("favorite-feed")
+    feed.onscroll = function(){   
+      var wh = window.innerHeight-58.6
+      if ((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)) {
+        // eslint-disable-next-line
+        console.log("Download next 10 favorites. scrollTop:"+feed.scrollTop)
+        self.scrollMax = feed.scrollHeight
+        self.offset += 10
+        self.InfinityFeed(self.offset)
+      }
+    }
+    var brandElement = document.getElementById("brand")
+    brandElement.onclick = function(){
+      feed.scrollTo({
+          top: 0,
+          behavior: "smooth"
       });
-      self.isLoading = false
-    })
+    }
+  },
+  created: function(){
+    this.InfinityFeed(0)
   }
 }
 </script>

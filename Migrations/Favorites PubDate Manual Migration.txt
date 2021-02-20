@@ -1,0 +1,4 @@
+db.FavoriteFeedItem.find().forEach((element)=> { 
+      element.PubDate = new Date(Date.parse(element.Date.toString())); 
+      db.FavoriteFeedItem.save(element);
+});

@@ -59,7 +59,7 @@ export default {
           var dateA = new Date(a.date)
           var dateB = new Date(b.date)
           return dateA < dateB
-        }).reverse()
+        })
         var pushCounter = 0;
         feedNews.forEach(element => {
           if(!self.feed.some(x => x.itemHash === element.itemHash))

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -24,7 +25,7 @@ namespace Influunt.Host.ViewModels
         /// <summary>
         /// Creation date
         /// </summary>
-        public string Date { get; set; }
+        public DateTime Date { get; set; }
         /// <summary>
         /// Channel name where news published
         /// </summary>
