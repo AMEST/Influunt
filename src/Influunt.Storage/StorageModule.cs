@@ -37,6 +37,7 @@ namespace Influunt.Storage
             //Services
             services.AddSingleton<IUserService, UserService>();
             services.AddScoped<IChannelService, ChannelService>();
+            services.AddScoped<IFavoriteFeedService, FavoriteService>();
         }
     }
 }
