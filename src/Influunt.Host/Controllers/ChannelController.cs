@@ -70,9 +70,6 @@ namespace Influunt.Host.Controllers
         public async Task<IActionResult> Post([FromBody] FeedChannelViewModel channel)
         {
             var user = await _userService.GetCurrentUser();
-            if (!ValidateChannel(channel))
-                return BadRequest();
-
             var channelEntity = channel.ToEntity();
             channelEntity.UserId = user.Id;
             await _channelService.Add(channelEntity);
@@ -92,8 +89,6 @@ namespace Influunt.Host.Controllers
         public async Task<IActionResult> Put(string id, [FromBody] FeedChannelViewModel channel)
         {
             var user = await _userService.GetCurrentUser();
-            if (!ValidateChannel(channel))
-                return BadRequest();
 
             var channelInStore = await _channelService.Get(id);
             if (!channelInStore.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
@@ -119,17 +114,6 @@ namespace Influunt.Host.Controllers
             var user = await _userService.GetCurrentUser();
             var channel = await _channelService.Get(id);
             await _channelService.Remove(user, channel);
-        }
-
-        private static bool ValidateChannel(FeedChannelViewModel channel)
-        {
-            if (string.IsNullOrWhiteSpace(channel.Name)
-                || string.IsNullOrWhiteSpace(channel.Url)
-                ||(!channel.Url.StartsWith("http://")
-                && !channel.Url.StartsWith("https://")))
-                return false;
-
-            return true;
         }
     }
 }

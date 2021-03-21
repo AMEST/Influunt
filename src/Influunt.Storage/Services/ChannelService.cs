@@ -9,7 +9,7 @@ using Skidbladnir.Repository.Abstractions;
 
 namespace Influunt.Storage.Services
 {
-    public class ChannelService: IChannelService
+    public class ChannelService : IChannelService
     {
         private readonly IRepository<FeedChannel> _channelRepository;
 
@@ -30,7 +30,6 @@ namespace Influunt.Storage.Services
             await _channelRepository.Create(channel);
 
             return channel;
-
         }
 
         public Task Remove(User user, FeedChannel channel)

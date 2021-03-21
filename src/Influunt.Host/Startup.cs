@@ -88,11 +88,6 @@ namespace Influunt.Host
                     c.IncludeXmlComments($"{AppContext.BaseDirectory}{Path.DirectorySeparatorChar}{_env.ApplicationName}.xml");
 
                 });
-            //AddModules
-
-            var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<StorageConfiguration>();
-            services.AddRssModule(Configuration.GetSection("FeedService"));
-            services.AddStorage(storageCfg);
         }
 
         /// <summary>

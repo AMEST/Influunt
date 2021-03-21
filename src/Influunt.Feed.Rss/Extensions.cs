@@ -27,7 +27,7 @@ namespace Influunt.Feed.Rss
             DistributedCacheEntryOptions options)
         {
             var serializedEntry = JsonConvert.SerializeObject(entry);
-            cache.Set(key, Encoding.UTF8.GetBytes(serializedEntry),options);
+            cache.Set(key, Encoding.UTF8.GetBytes(serializedEntry), options);
             serializedEntry = null;
         }
 

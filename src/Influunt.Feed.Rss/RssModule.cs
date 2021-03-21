@@ -1,33 +1,20 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using Skidbladnir.Modules;
 
 namespace Influunt.Feed.Rss
 {
-    public static class RssModule
+    public class RssModule : Module
     {
-        public static IServiceCollection AddRssModule(this IServiceCollection services,
-            IConfigurationSection configurationSection)
-        {
-            var configuration = new RssFeedServiceConfiguration();
-            configurationSection?.Bind(configuration);
-            services.AddSingleton<IRssFeedServiceConfiguration>(configuration);
-            return services.AddRssModule();
-        }
-
-        public static IServiceCollection AddRssModule(this IServiceCollection services,
-            IRssFeedServiceConfiguration configuration)
-        {
-            services.AddSingleton(configuration);
-            return services.AddRssModule();
-        }
-
-        private static IServiceCollection AddRssModule(this IServiceCollection services)
+        public override void Configure(IServiceCollection services)
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+            var configuration = Configuration.GetSection("FeedService").Get<RssFeedServiceConfiguration>();
+            services.AddSingleton<IRssFeedServiceConfiguration>(configuration);
             services.AddScoped<IFeedService, RssFeedService>();
             services.AddHostedService<FeedUpdateWorker>();
-            return services;
         }
     }
 }

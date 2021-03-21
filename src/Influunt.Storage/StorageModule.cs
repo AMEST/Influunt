@@ -2,20 +2,17 @@
 using Influunt.Feed.Entity;
 using Influunt.Storage.Entity;
 using Influunt.Storage.Services;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using MongoDB.Bson.Serialization.Conventions;
-using Skidbladnir.Caching.Distributed.MongoDB;
-using Skidbladnir.DataProtection.MongoDb;
+using Skidbladnir.Modules;
 using Skidbladnir.Repository.MongoDB;
 
 namespace Influunt.Storage
 {
-    public static class StorageModule
+    public class StorageModule : Module
     {
-        public static IServiceCollection AddStorage(this IServiceCollection services,
-            StorageConfiguration configuration)
+        public override void Configure(IServiceCollection services)
         {
             // Register conventions
             var pack = new ConventionPack
@@ -26,25 +23,21 @@ namespace Influunt.Storage
 
             ConventionRegistry.Register("Influunt", pack, t => true);
 
+            var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<StorageConfiguration>();
+
             //Database
             services.AddMongoDbContext(builder =>
-                {
-                    builder.UseConnectionString(configuration.ConnectionString);
-                    builder.AddEntity<User, UserMap>();
-                    builder.AddEntity<FeedChannel, FeedChannelMap>();
-                    builder.AddEntity<FavoriteFeedItem, FavoriteFeedItemMap>();
-                    builder.UseDataProtection(services);
-                    builder.UseMongoDistributedCache(services);
-                });
-
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            {
+                builder.UseConnectionString(storageCfg.ConnectionString);
+                builder.AddEntity<User, UserMap>();
+                builder.AddEntity<FeedChannel, FeedChannelMap>();
+                builder.AddEntity<FavoriteFeedItem, FavoriteFeedItemMap>();
+            });
 
             //Services
             services.AddSingleton<IUserService, UserService>();
             services.AddScoped<IChannelService, ChannelService>();
             services.AddScoped<IFavoriteFeedService, FavoriteService>();
-
-            return services;
         }
     }
 }
