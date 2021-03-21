@@ -5,7 +5,7 @@ using Skidbladnir.Modules;
 
 namespace Influunt.Feed.Rss
 {
-    public class RssModule: RunnableModule
+    public class RssModule : RunnableModule
     {
         public override void Configure(IServiceCollection services)
         {

@@ -55,10 +55,7 @@ namespace Influunt.Feed.Rss
                 _logger.LogInformation("Count active users ({DaysAgo} days) for update feed: {ActiveUsers}",
                     _configuration.LastActivityDaysAgo, updateTasks.Length);
                 Task.WaitAll(updateTasks);
-                foreach (var updateTask in updateTasks)
-                {
-                    updateTask.Dispose();
-                }
+                foreach (var updateTask in updateTasks) updateTask.Dispose();
             }
         }
 

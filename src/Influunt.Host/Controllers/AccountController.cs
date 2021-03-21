@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Influunt.Feed;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Influunt.Feed.Entity;
 using Influunt.Host.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
