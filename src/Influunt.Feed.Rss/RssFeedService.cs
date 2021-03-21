@@ -34,9 +34,9 @@ namespace Influunt.Feed.Rss
             var feed = new List<FeedItem>();
 
             var taskList = userChannels
-                            .Where(c => !c.Hidden)
-                            .Select(GetFeedFromChannelCached)
-                            .ToList();
+                .Where(c => !c.Hidden)
+                .Select(GetFeedFromChannelCached)
+                .ToList();
 
             await Task.WhenAll(taskList);
 

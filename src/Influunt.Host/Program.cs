@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Skidbladnir.Modules;
 
 namespace Influunt.Host
 {
@@ -15,6 +16,7 @@ namespace Influunt.Host
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
-                });
+                })
+                .UseSkidbladnirModules<StartupModule>();
     }
 }

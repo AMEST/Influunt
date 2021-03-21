@@ -45,7 +45,7 @@ namespace Influunt.Storage.Services
 
         public Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset)
         {
-            return Task.Run(() => GetFavorites(user,offset).ToList().AsEnumerable());
+            return Task.Run(() => GetFavorites(user, offset).ToList().AsEnumerable());
         }
 
         private IQueryable<FavoriteFeedItem> GetFavorites(User user, int? offset)

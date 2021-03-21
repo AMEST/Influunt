@@ -2,7 +2,7 @@
 
 namespace Influunt.Feed.Entity
 {
-    public class FeedChannel: IHasId
+    public class FeedChannel : IHasId
     {
         public string Url { get; set; }
 

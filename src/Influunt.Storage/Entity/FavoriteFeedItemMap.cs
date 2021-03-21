@@ -3,7 +3,7 @@ using Skidbladnir.Repository.MongoDB;
 
 namespace Influunt.Storage.Entity
 {
-    public class FavoriteFeedItemMap: EntityMapClass<FavoriteFeedItem>
+    public class FavoriteFeedItemMap : EntityMapClass<FavoriteFeedItem>
     {
         public FavoriteFeedItemMap()
         {

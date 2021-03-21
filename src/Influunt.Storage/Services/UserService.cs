@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Influunt.Storage.Services
 {
-    public class UserService: IUserService
+    public class UserService : IUserService
     {
         private readonly IRepository<User> _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -40,7 +40,6 @@ namespace Influunt.Storage.Services
             user.LastActivity = DateTime.UtcNow;
             await Update(user);
             return user;
-
         }
 
         public Task<User> GetUserById(string id)
@@ -50,7 +49,8 @@ namespace Influunt.Storage.Services
 
         public async Task<User> GetUserByEmail(string email)
         {
-            var user = await Task.Run(()=>_userRepository.GetAll().SingleOrDefault(u => u.Email.ToLower() == email.ToLower()));
+            var user = await Task.Run(() =>
+                _userRepository.GetAll().SingleOrDefault(u => u.Email.ToLower() == email.ToLower()));
             return user;
         }
 

@@ -8,6 +8,6 @@
     <Copyright>Klabukov Erik</Copyright>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Skidbladnir.Repository.Abstractions" Version="0.0.1-build0003" />
+    <PackageReference Include="Skidbladnir.Repository.Abstractions" Version="1.0.1-unstalable.0.1" />
   </ItemGroup>
 </Project>

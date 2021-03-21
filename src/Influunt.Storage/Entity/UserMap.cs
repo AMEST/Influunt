@@ -4,7 +4,7 @@ using System;
 
 namespace Influunt.Storage.Entity
 {
-    public class UserMap: EntityMapClass<User>
+    public class UserMap : EntityMapClass<User>
     {
         public UserMap()
         {
