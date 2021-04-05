@@ -103,26 +103,11 @@ namespace Influunt.Feed.Rss
             try
             {
                 using (var result = await _rssClient.GetAsync(channel.Url))
-                using (var xmlRss = await result.Content.ReadAsStreamAsync())
                 {
-                    var ser = new XmlSerializer(typeof(RssBody));
-                    var rssBody = (RssBody) ser.Deserialize(xmlRss);
-
-                    return rssBody.Channel.Item.Select(rssItem =>
-                    {
-                        var item = new FeedItem
-                        {
-                            Title = rssItem.Title,
-                            Description = rssItem.Description,
-                            PubDate = DateTime.UtcNow.AddDays(-31),
-                            Link = rssItem.Link?.ToString(),
-                            ChannelName = channel.Name ?? ""
-                        };
-                        if (DateTime.TryParse(rssItem.PubDate, out var pubDate))
-                            item.PubDate = pubDate;
-
-                        return item.NormalizeDescription();
-                    }).ToList();
+                    var xmlRss = await result.Content.ReadAsStringAsync();
+                    return xmlRss.IsAtomRss()
+                        ? xmlRss.FeedFromAtomRss(channel)
+                        : xmlRss.FeedFromRss(channel);
                 }
             }
             catch (Exception e)
