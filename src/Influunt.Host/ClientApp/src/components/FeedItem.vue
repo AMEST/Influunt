@@ -3,9 +3,11 @@
         <b-card-text>
             <span v-html="this.description"></span>
         </b-card-text>
-        <b-button v-bind:href="this.link" target="_blank" variant="outline-secondary">Read more</b-button>
-        <b-button v-if="!this.inFavorite && !this.isFavorite" variant="outline-warning" class="favorite" @click="AddToFavorite"><b-icon icon="star-fill"/></b-button>
-        <b-button v-if="this.isFavorite" variant="outline-warning" class="favorite" @click="RemoveFromFavorite"><b-icon icon="trash-fill"/></b-button>
+        <div style="min-height: 46px">
+            <b-button v-if="this.link" v-bind:href="this.link" target="_blank" variant="outline-secondary">Read more</b-button>
+            <b-button v-if="!this.inFavorite && !this.isFavorite" variant="outline-warning" class="favorite" @click="AddToFavorite"><b-icon icon="star-fill"/></b-button>
+            <b-button v-if="this.isFavorite" variant="outline-warning" class="favorite" @click="RemoveFromFavorite"><b-icon icon="trash-fill"/></b-button>
+        </div>
     </b-card>
 </template>
 <script>

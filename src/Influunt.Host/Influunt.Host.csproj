@@ -24,9 +24,9 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="3.1.13" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="1.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.4" />
-    <PackageReference Include="Skidbladnir.Modules" Version="1.1.0" />
-    <PackageReference Include="Skidbladnir.Caching.Distributed.MongoDB" Version="1.1.0" />
-    <PackageReference Include="Skidbladnir.DataProtection.MongoDb" Version="1.1.0" />
+    <PackageReference Include="Skidbladnir.Modules" Version="1.1.1-unstalable.0.1" />
+    <PackageReference Include="Skidbladnir.Caching.Distributed.MongoDB" Version="1.1.1-unstalable.0.1" />
+    <PackageReference Include="Skidbladnir.DataProtection.MongoDb" Version="1.1.1-unstalable.0.1" />
     <PackageReference Include="VueCliMiddleware" Version="3.1.1" />
   </ItemGroup>
   <ItemGroup>
