@@ -9,20 +9,14 @@
 
             <b-col v-if="this.$store.state.application.isMenuOpened || !needMenuClosable" class="inrow-menu pt-4 pr-0" v-bind:class="[needMenuClosable ? 'ocmenu ocmenu-shadow bg-dark' : 'w-25']">
               <b-list-group>
-                <b-list-group-item class="light-item">
-                  <router-link class="pl-1" to="/">
+                <b-list-group-item to="/" class="light-item t-align-left">
                     <b-icon icon="rss" class="mr-2"/> Feed
-                  </router-link>
                 </b-list-group-item>
-                <b-list-group-item class="light-item">
-                  <router-link class="pl-1" to="/favorite">
+                <b-list-group-item to="/favorite" class="light-item t-align-left">
                     <b-icon icon="star-fill" class="mr-2"/> Favorite
-                  </router-link>
                 </b-list-group-item>
-                <b-list-group-item class="light-item">
-                  <router-link class="pl-1" to="/channels">
+                <b-list-group-item to="/channels" class="light-item t-align-left">
                     <b-icon icon="receipt" class="mr-2"/> Channels
-                  </router-link>
                 </b-list-group-item>
               </b-list-group>
               <div align="center"> 
@@ -134,12 +128,18 @@ export default {
     .light-item:hover, .light-item:active, .light-item-active{
         background-color: rgba(60, 67, 72) !important;
     }
+    .t-align-left{
+      text-align: left !important;
+    }
     .light-item a{
         width: 100%!important;
         height: 100%!important;
         display: block;
         color: #f8f9fa !important;
         text-align: left;
+    }
+    .light-item svg{
+      text-align: left;
     }
     .inrow-menu{
         max-width: 25% !important;

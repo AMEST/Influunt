@@ -1,10 +1,8 @@
-﻿using System;
-
-namespace Influunt.Feed.Rss
+﻿namespace Influunt.Feed.Rss
 {
-    public class RssFeedServiceConfiguration : IRssFeedServiceConfiguration
+    public class RssFeedServiceConfiguration
     {
-        public TimeSpan FeedUpdatePeriod { get; set; } = TimeSpan.FromMinutes(30);
+        public string FeedUpdateCron { get; set; } = "*/30 * * * *";
         public double LastActivityDaysAgo { get; set; } = 2;
     }
 }

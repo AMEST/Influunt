@@ -23,7 +23,7 @@ namespace Influunt.Storage
 
             ConventionRegistry.Register("Influunt", pack, t => true);
 
-            var storageCfg = Configuration.GetSection("ConnectionStrings:Mongo").Get<StorageConfiguration>();
+            var storageCfg = Configuration.Get<StorageConfiguration>();
 
             //Database
             services.AddMongoDbContext(builder =>
