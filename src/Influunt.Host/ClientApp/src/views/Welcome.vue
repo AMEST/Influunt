@@ -59,8 +59,8 @@ export default {
     .auth-standart-button-size{
         width: 200px;
     }
-    .jbg{
-        background-image: url("/img/bg.jpg");
+    .jbg {
+        background-image: url("/img/triangulated-bg.png");
         background-position: center;
     }
     .fork-me{
