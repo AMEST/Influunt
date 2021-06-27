@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Influunt.Feed.Entity;
 
 namespace Influunt.Feed.Rss
