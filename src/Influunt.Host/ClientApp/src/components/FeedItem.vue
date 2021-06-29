@@ -56,7 +56,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
     .card{
         margin-top: 15px;
         text-align: left;
@@ -64,6 +64,9 @@ export default {
     }
     .card-text{
         overflow-x: hidden;
+    }
+    .card-text img{
+        width: 100%!important;
     }
     .card:hover{
         background-color: rgba(60, 67, 72) !important;
