@@ -20,7 +20,7 @@ namespace Influunt.Storage.Services
 
         public Task<FeedChannel> Get(string id)
         {
-            return _channelRepository.Get(id);
+            return Task.Run(() => _channelRepository.GetAll().SingleOrDefault(x => x.Id == id));
         }
 
         public async Task<FeedChannel> Add(FeedChannel channel)
@@ -36,16 +36,14 @@ namespace Influunt.Storage.Services
         {
             if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return Task.CompletedTask;
-            _channelRepository.Delete(channel.Id);
-            return Task.CompletedTask;
+            return _channelRepository.Delete(channel);
         }
 
         public Task Update(User user, FeedChannel channel)
         {
             if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return Task.CompletedTask;
-            _channelRepository.Update(channel);
-            return Task.CompletedTask;
+            return _channelRepository.Update(channel);
         }
 
         public Task<IEnumerable<FeedChannel>> GetUserChannels(User user)

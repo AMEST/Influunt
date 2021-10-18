@@ -52,8 +52,8 @@ namespace Influunt.Feed
         /// <summary>
         /// Удаление пользователя
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="User"></param>
         /// <returns></returns>
-        Task Remove(string id);
+        Task Remove(User user);
     }
 }

@@ -36,11 +36,11 @@ namespace Influunt.Storage.Services
 
         public async Task Remove(User user, string id)
         {
-            var favorite = await _favoriteRepository.Get(id);
+            var favorite = _favoriteRepository.GetAll().SingleOrDefault(x=>x.Id == id);
             if (favorite == null || !favorite.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return;
 
-            _favoriteRepository.Delete(favorite.Id);
+            await _favoriteRepository.Delete(favorite);
         }
 
         public Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset)

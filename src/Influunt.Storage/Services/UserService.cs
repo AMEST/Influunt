@@ -44,7 +44,7 @@ namespace Influunt.Storage.Services
 
         public Task<User> GetUserById(string id)
         {
-            return _userRepository.Get(id);
+            return Task.Run(() => _userRepository.GetAll().SingleOrDefault(x => x.Id == id));
         }
 
         public async Task<User> GetUserByEmail(string email)
@@ -64,14 +64,12 @@ namespace Influunt.Storage.Services
 
         public Task Update(User updatedUser)
         {
-            _userRepository.Update(updatedUser);
-            return Task.CompletedTask;
+            return _userRepository.Update(updatedUser);
         }
 
-        public Task Remove(string id)
+        public Task Remove(User user)
         {
-            _userRepository.Delete(id);
-            return Task.CompletedTask;
+            return _userRepository.Delete(user);
         }
     }
 }

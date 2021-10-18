@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Influunt.Feed.Rss;
 using Influunt.Storage;
 using Microsoft.AspNetCore.Hosting;
@@ -9,9 +10,9 @@ namespace Influunt.Host
 {
     internal class Program
     {
-        public static void Main(string[] args)
+        public static Task Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+            return CreateHostBuilder(args).Build().RunAsync();
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args) =>

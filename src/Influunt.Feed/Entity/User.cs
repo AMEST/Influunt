@@ -5,7 +5,7 @@ using Skidbladnir.Repository.Abstractions;
 
 namespace Influunt.Feed.Entity
 {
-    public class User : IHasId
+    public class User : IHasId<string>
     {
         public string Email { get; set; }
         public string Name { get; set; }
