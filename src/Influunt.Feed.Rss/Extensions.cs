@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 using Influunt.Feed.Entity;
 using Microsoft.Extensions.Caching.Distributed;
@@ -26,12 +27,11 @@ namespace Influunt.Feed.Rss
             return true;
         }
 
-        public static void Set(this IDistributedCache cache, string key, object entry,
+        public static Task SetAsync(this IDistributedCache cache, string key, object entry,
             DistributedCacheEntryOptions options)
         {
             var serializedEntry = JsonConvert.SerializeObject(entry);
-            cache.Set(key, Encoding.UTF8.GetBytes(serializedEntry), options);
-            serializedEntry = null;
+            return cache.SetAsync(key, Encoding.UTF8.GetBytes(serializedEntry), options);
         }
 
 

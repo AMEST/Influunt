@@ -65,7 +65,7 @@ namespace Influunt.Feed.Rss
                 return feed.GetChunckedFeed(offset, count);
 
             feed = await GetFeedFromChannel(channel);
-            _distributedCache.Set($"channel_url_{channel.Url}", feed, new DistributedCacheEntryOptions()
+            await _distributedCache.SetAsync($"channel_url_{channel.Url}", feed, new DistributedCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
             });
@@ -89,7 +89,7 @@ namespace Influunt.Feed.Rss
 
                 channelFeed = await GetFeedFromChannel(channel);
                 if (channelFeed.Any())
-                    _distributedCache.Set($"channel_url_{channel.Url}", channelFeed, new DistributedCacheEntryOptions()
+                    await _distributedCache.SetAsync($"channel_url_{channel.Url}", channelFeed, new DistributedCacheEntryOptions()
                     {
                         AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
                     });
