@@ -25,6 +25,7 @@ In order to use the service, you need to log in (so that the user can add his ch
 1. Channels (add/edit/change visible in feed/remove)
 1. PWA functional with offline mode (request caching)
 1. Automatic background update of news feed to cache for active accounts
+1. Redis distributed cache (faster retrieval of news from cache)
 
 ## Self-hosted Requirements
 * MongoDB - For storing user data (channels, favorites) and for aspnet core secure storage.
@@ -48,6 +49,7 @@ services:
     image: eluki/influunt
     environment:
       - "ConnectionStrings:Mongo:ConnectionString=[MONGO DB CONNECTION STRING]"
+      - "ConnectionStrings:Redis:ConnectionString=[Redis address]" # optional redis-based distributed cache connection
       - "Authentication:Google:ClientSecret=[GOOGLE CLIENT SECRET]"
       - "Authentication:Google:ClientId=[GOOGLE CLIENT ID]"
     ports:
@@ -75,6 +77,7 @@ docker run -d \
            -e "ConnectionStrings:Mongo:ConnectionString=[MONGO DB CONNECTION STRING]" \
            -e "Authentication:Google:ClientSecret=[GOOGLE CLIENT SECRET]" \
            -e "Authentication:Google:ClientId=[GOOGLE CLIENT ID]" \
+           -e "ConnectionStrings:Redis:ConnectionString=[Redis address]" \
            --restart always \
            --name influunt \
            eluki/influunt
