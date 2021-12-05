@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Influunt.Feed.Entity;
 
@@ -15,15 +14,15 @@ namespace Influunt.Feed.Rss
         private readonly IChannelService _channelService;
         private readonly IDistributedCache _distributedCache;
         private readonly ILogger<RssFeedService> _logger;
-        private readonly HttpClient _rssClient;
+        private readonly RssClient _rssClient;
 
-        public RssFeedService(IChannelService channelService, IDistributedCache distributedCache,
+        public RssFeedService(RssClient rssClient, IChannelService channelService, IDistributedCache distributedCache,
             ILogger<RssFeedService> logger)
         {
+            _rssClient = rssClient;
             _channelService = channelService;
             _distributedCache = distributedCache;
             _logger = logger;
-            _rssClient = new HttpClient();
         }
 
         public async Task<IEnumerable<FeedItem>> GetFeed(User user, int? offset = null, int count = 10)
@@ -52,7 +51,7 @@ namespace Influunt.Feed.Rss
             _logger.LogDebug($"Elapsed time for getting user ({user.Id}) feed: {sw.Elapsed.TotalMilliseconds}ms");
             feed = feed.OrderByDescending(f => f.PubDate).ToList();
 
-            return feed.GetChunckedFeed(offset, count);
+            return feed.GetChunkedFeed(offset, count);
         }
 
         public async Task<IEnumerable<FeedItem>> GetFeed(User user, FeedChannel channel, int? offset = null,
@@ -61,61 +60,39 @@ namespace Influunt.Feed.Rss
             if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return new List<FeedItem>();
 
-            if (_distributedCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> feed))
-                return feed.GetChunckedFeed(offset, count);
+            var feed = await _distributedCache.GetAsync<List<FeedItem>>($"channel_url_{channel.Url}");
 
-            feed = await GetFeedFromChannel(channel);
+            if (feed != null && feed.Count != 0)
+                return feed.GetChunkedFeed(offset, count);
+
+            feed = await _rssClient.GetFeed(channel);
             await _distributedCache.SetAsync($"channel_url_{channel.Url}", feed, new DistributedCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
             });
 
-            return feed.GetChunckedFeed(offset, count);
+            return feed.GetChunkedFeed(offset, count);
         }
 
         public void Dispose()
         {
-            _rssClient?.Dispose();
             GC.Collect();
             GC.SuppressFinalize(this);
         }
 
-        private Task<List<FeedItem>> GetFeedFromChannelCached(FeedChannel channel)
+        private async Task<List<FeedItem>> GetFeedFromChannelCached(FeedChannel channel)
         {
-            return Task.Run(async () =>
-            {
-                if (_distributedCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> channelFeed))
-                    return channelFeed;
-
-                channelFeed = await GetFeedFromChannel(channel);
-                if (channelFeed.Any())
-                    await _distributedCache.SetAsync($"channel_url_{channel.Url}", channelFeed, new DistributedCacheEntryOptions()
-                    {
-                        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
-                    });
+            var channelFeed = await _distributedCache.GetAsync<List<FeedItem>>($"channel_url_{channel.Url}");
+            if (channelFeed != null && channelFeed.Count != 0)
                 return channelFeed;
-            });
-        }
 
-        private async Task<List<FeedItem>> GetFeedFromChannel(FeedChannel channel)
-        {
-            try
-            {
-                using (var result = await _rssClient.GetAsync(channel.Url))
+            channelFeed = await _rssClient.GetFeed(channel);
+            if (channelFeed.Any())
+                await _distributedCache.SetAsync($"channel_url_{channel.Url}", channelFeed, new DistributedCacheEntryOptions()
                 {
-                    var xmlRss = await result.Content.ReadAsStringAsync();
-                    return xmlRss.IsAtomRss()
-                        ? xmlRss.FeedFromAtomRss(channel)
-                        : xmlRss.FeedFromRss(channel);
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(
-                    "Can not get rss feed from \nchannel: {channelName}\nurl: {channelUrl}\n with error: {message} ",
-                    channel.Name, channel.Url, e.Message);
-                return new List<FeedItem>();
-            }
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                });
+            return channelFeed;
         }
     }
 }

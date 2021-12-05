@@ -13,18 +13,12 @@ namespace Influunt.Feed.Rss
 {
     public static class Extensions
     {
-        public static bool TryGetValue<TResult>(this IDistributedCache cache, string key, out TResult result)
+        public static async Task<T> GetAsync<T>(this IDistributedCache cache, string key)
         {
-            var cacheValue = cache.Get(key);
-            if (cacheValue == null)
-            {
-                result = default;
-                return false;
-            }
-
-            result = JsonConvert.DeserializeObject<TResult>(Encoding.UTF8.GetString(cacheValue));
-            cacheValue = null;
-            return true;
+            var cacheValue = await cache.GetStringAsync(key);
+            if (string.IsNullOrWhiteSpace(cacheValue))
+                return default;
+            return JsonConvert.DeserializeObject<T>(cacheValue);
         }
 
         public static Task SetAsync(this IDistributedCache cache, string key, object entry,
@@ -35,7 +29,7 @@ namespace Influunt.Feed.Rss
         }
 
 
-        public static IEnumerable<FeedItem> GetChunckedFeed(this IEnumerable<FeedItem> feed, int? offset, int count)
+        public static IEnumerable<FeedItem> GetChunkedFeed(this IEnumerable<FeedItem> feed, int? offset, int count)
         {
             return offset == null ? feed : feed.Skip(offset.Value).Take(count);
         }
@@ -50,7 +44,7 @@ namespace Influunt.Feed.Rss
             using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xml ?? "")))
             {
                 var ser = new XmlSerializer(typeof(RssBody));
-                var rssBody = (RssBody) ser.Deserialize(memoryStream);
+                var rssBody = (RssBody)ser.Deserialize(memoryStream);
                 return rssBody.Channel.Item.Select(rssItem =>
                 {
                     var item = new FeedItem
@@ -75,7 +69,7 @@ namespace Influunt.Feed.Rss
             using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xml ?? "")))
             {
                 var ser = new XmlSerializer(typeof(Feed));
-                var rssBody = (Feed) ser.Deserialize(memoryStream);
+                var rssBody = (Feed)ser.Deserialize(memoryStream);
                 return rssBody.Entry.Select(rssItem =>
                 {
                     var item = new FeedItem

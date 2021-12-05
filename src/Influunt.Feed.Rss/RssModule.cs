@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Skidbladnir.Modules;
 
@@ -19,6 +18,7 @@ namespace Influunt.Feed.Rss
 
             _moduleConfiguration = Configuration.Get<RssFeedServiceConfiguration>();
             services.AddSingleton<RssFeedServiceConfiguration>(_moduleConfiguration);
+            services.AddHttpClient<RssClient>();
             services.AddScoped<IFeedService, RssFeedService>();
         }
 
