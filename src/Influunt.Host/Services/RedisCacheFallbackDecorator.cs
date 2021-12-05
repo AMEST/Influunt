@@ -23,43 +23,43 @@ namespace Influunt.Host.Services
 
         public byte[] Get(string key)
         {
-            return ExecuteCatched(() => _distributedCache.Get(key));
+            return ExecuteCatched(() => _distributedCache.Get(key.ToApplicationKey()));
         }
 
         public Task<byte[]> GetAsync(string key, CancellationToken token = new CancellationToken())
         {
-            return ExecuteCatchedAsync(() => _distributedCache.GetAsync(key, token));
+            return ExecuteCatchedAsync(() => _distributedCache.GetAsync(key.ToApplicationKey(), token));
         }
 
         public void Set(string key, byte[] value, DistributedCacheEntryOptions options)
         {
-            ExecuteCatched(() => _distributedCache.Set(key, value, options));
+            ExecuteCatched(() => _distributedCache.Set(key.ToApplicationKey(), value, options));
         }
 
         public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options,
             CancellationToken token = new CancellationToken())
         {
-            return ExecuteCatchedAsync(() => _distributedCache.SetAsync(key, value, options, token));
+            return ExecuteCatchedAsync(() => _distributedCache.SetAsync(key.ToApplicationKey(), value, options, token));
         }
 
         public void Refresh(string key)
         {
-            ExecuteCatched(() => _distributedCache.Refresh(key));
+            ExecuteCatched(() => _distributedCache.Refresh(key.ToApplicationKey()));
         }
 
         public Task RefreshAsync(string key, CancellationToken token = new CancellationToken())
         {
-            return ExecuteCatchedAsync(() => _distributedCache.RefreshAsync(key, token));
+            return ExecuteCatchedAsync(() => _distributedCache.RefreshAsync(key.ToApplicationKey(), token));
         }
 
         public void Remove(string key)
         {
-            ExecuteCatched(() => _distributedCache.Remove(key));
+            ExecuteCatched(() => _distributedCache.Remove(key.ToApplicationKey()));
         }
 
         public Task RemoveAsync(string key, CancellationToken token = new CancellationToken())
         {
-            return ExecuteCatchedAsync(() => _distributedCache.RemoveAsync(key, token));
+            return ExecuteCatchedAsync(() => _distributedCache.RemoveAsync(key.ToApplicationKey(), token));
         }
 
         private T ExecuteCatched<T>(Func<T> func) => ExecuteCatchedAsync(() => Task.Factory.StartNew(func)).Result;
@@ -73,7 +73,7 @@ namespace Influunt.Host.Services
             {
                 return await func();
             }
-            catch (Exception e) when (e is RedisConnectionException || e is RedisTimeoutException )
+            catch (Exception e) when (e is RedisConnectionException || e is RedisTimeoutException)
             {
                 _lastRedisFailTime = DateTime.UtcNow;
                 _logger.LogError("Redis connection error. {Message}", e.Message);
@@ -91,7 +91,7 @@ namespace Influunt.Host.Services
             {
                 await func();
             }
-            catch (Exception e) when (e is RedisConnectionException || e is RedisTimeoutException )
+            catch (Exception e) when (e is RedisConnectionException || e is RedisTimeoutException)
             {
                 _lastRedisFailTime = DateTime.UtcNow;
                 _logger.LogError("Redis connection error. {Message}", e.Message);
@@ -101,6 +101,17 @@ namespace Influunt.Host.Services
         private bool IsRedisUnhealthy()
         {
             return _lastRedisFailTime.Add(_redisPauseTime) > DateTime.UtcNow;
+        }
+    }
+
+    internal static class KeyExtensions
+    {
+        private const string KeyPrefix = "Influunt.";
+        public static string ToApplicationKey(this string key)
+        {
+            return key.StartsWith(KeyPrefix)
+                ? key
+                : $"{KeyPrefix}{key}";
         }
     }
 }
