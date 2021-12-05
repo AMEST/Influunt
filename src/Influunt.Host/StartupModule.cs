@@ -27,7 +27,7 @@ namespace Influunt.Host
         private void ConfigureDistributedCache(IServiceCollection services)
         {
             var redisConfiguration = Configuration.Get<RedisConfiguration>();
-            if(string.IsNullOrWhiteSpace(redisConfiguration.ConnectionString))
+            if(string.IsNullOrWhiteSpace(redisConfiguration?.ConnectionString))
             {
                 services.UseMongoDistributedCache();
             }

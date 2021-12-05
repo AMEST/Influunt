@@ -52,7 +52,7 @@ namespace Influunt.Feed.Rss
             _logger.LogDebug($"Elapsed time for getting user ({user.Id}) feed: {sw.Elapsed.TotalMilliseconds}ms");
             feed = feed.OrderByDescending(f => f.PubDate).ToList();
 
-            return feed.GetChunckedFeed(offset, count);
+            return feed.GetChunkedFeed(offset, count);
         }
 
         public async Task<IEnumerable<FeedItem>> GetFeed(User user, FeedChannel channel, int? offset = null,
@@ -61,8 +61,10 @@ namespace Influunt.Feed.Rss
             if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return new List<FeedItem>();
 
-            if (_distributedCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> feed))
-                return feed.GetChunckedFeed(offset, count);
+            var feed = await _distributedCache.GetAsync<List<FeedItem>>($"channel_url_{channel.Url}");
+
+            if (feed != null && feed.Count != 0)
+                return feed.GetChunkedFeed(offset, count);
 
             feed = await GetFeedFromChannel(channel);
             await _distributedCache.SetAsync($"channel_url_{channel.Url}", feed, new DistributedCacheEntryOptions()
@@ -70,7 +72,7 @@ namespace Influunt.Feed.Rss
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
             });
 
-            return feed.GetChunckedFeed(offset, count);
+            return feed.GetChunkedFeed(offset, count);
         }
 
         public void Dispose()
@@ -84,7 +86,8 @@ namespace Influunt.Feed.Rss
         {
             return Task.Run(async () =>
             {
-                if (_distributedCache.TryGetValue($"channel_url_{channel.Url}", out List<FeedItem> channelFeed))
+                var channelFeed = await _distributedCache.GetAsync<List<FeedItem>>($"channel_url_{channel.Url}");
+                if (channelFeed != null && channelFeed.Count != 0)
                     return channelFeed;
 
                 channelFeed = await GetFeedFromChannel(channel);

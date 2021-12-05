@@ -73,7 +73,7 @@ namespace Influunt.Host.Services
             {
                 return await func();
             }
-            catch (RedisConnectionException e)
+            catch (Exception e) when (e is RedisConnectionException || e is RedisTimeoutException )
             {
                 _lastRedisFailTime = DateTime.UtcNow;
                 _logger.LogError("Redis connection error. {Message}", e.Message);
@@ -91,7 +91,7 @@ namespace Influunt.Host.Services
             {
                 await func();
             }
-            catch (RedisConnectionException e)
+            catch (Exception e) when (e is RedisConnectionException || e is RedisTimeoutException )
             {
                 _lastRedisFailTime = DateTime.UtcNow;
                 _logger.LogError("Redis connection error. {Message}", e.Message);
