@@ -1,7 +1,10 @@
 ﻿using System;
 using Influunt.Feed.Rss;
+using Influunt.Host.Configurations;
+using Influunt.Host.Services;
 using Influunt.Storage;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Skidbladnir.Caching.Distributed.MongoDB;
@@ -17,8 +20,23 @@ namespace Influunt.Host
         public override void Configure(IServiceCollection services)
         {
             services.UseDataProtection();
-            services.UseMongoDistributedCache();
+            ConfigureDistributedCache(services);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        }
+
+        private void ConfigureDistributedCache(IServiceCollection services)
+        {
+            var redisConfiguration = Configuration.Get<RedisConfiguration>();
+            if(string.IsNullOrWhiteSpace(redisConfiguration.ConnectionString))
+            {
+                services.UseMongoDistributedCache();
+            }
+            else
+            {
+                services.AddStackExchangeRedisCache(c => c.Configuration = redisConfiguration.ConnectionString)
+                        .Decorate<IDistributedCache, RedisCacheFallbackDecorator>();
+            }
+                
         }
     }
 }

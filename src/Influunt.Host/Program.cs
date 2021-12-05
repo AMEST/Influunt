@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Influunt.Feed.Rss;
+using Influunt.Host.Configurations;
 using Influunt.Storage;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,8 @@ namespace Influunt.Host
                     configuration.Add(rssFeedConfiguration);
                     var storageConfiguration = configuration.AppConfiguration.GetSection("ConnectionStrings:Mongo").Get<StorageConfiguration>();
                     configuration.Add(storageConfiguration);
+                    var redisConfiguration = configuration.AppConfiguration.GetSection("ConnectionStrings:Redis").Get<RedisConfiguration>();
+                    configuration.Add(redisConfiguration);
                 });
     }
 }
