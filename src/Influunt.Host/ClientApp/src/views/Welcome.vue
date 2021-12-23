@@ -1,6 +1,6 @@
 <template>
-    <div class="row align-items-center h-100vh">
-        <b-jumbotron class="bg-dark text-light width-max height-max jbg" header="Influunt Welcome">
+    <div class="row align-items-center h-100vh" id="welcome">
+        <b-jumbotron class="bg-dark text-light width-max height-max jbg" header="Influunt">
             <h5 class="pb-4">Welcome to the lightweight RSS news feed aggregator.</h5>
             <b-button variant="outline-danger" href="#" class="auth-standart-button-size" @click="auth">
                 <img class="icon" src="../assets/google.png"/>
@@ -43,6 +43,14 @@ export default {
 </script>
 
 <style scoped>
+    #welcome{
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        margin: 0!important;
+    }
     .h-100vh{
         height: calc(100vh - 58.8px);
     }
@@ -57,7 +65,7 @@ export default {
         max-width: 32px;
     }
     .auth-standart-button-size{
-        width: 200px;
+        width: 204px;
     }
     .jbg {
         background-image: url("/img/triangulated-bg.png");

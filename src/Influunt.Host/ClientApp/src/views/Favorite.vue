@@ -1,5 +1,5 @@
 <template>
-  <div class="favorite enable-scroll" id="favorite-feed">
+  <div class="favorite pt-1 enable-scroll" id="favorite-feed">
     <b-row v-if="this.feed.length == 0" class="h-max align-items-center">
       <b-col class="text-center">
         <b-icon icon="star-fill" variant="warning" font-scale="7.5"/>

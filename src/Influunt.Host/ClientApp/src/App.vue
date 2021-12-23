@@ -96,6 +96,18 @@ export default {
     body{
       background-color: #343a40 !important;
     }
+    body .bg-dark{
+      background-color: #232221!important;
+    }
+    body .bg-dark .card{
+      background-color: #2f2f2f!important;
+    }
+    body .bg-dark .dropdown-menu {
+      background-color: #232221!important;
+    }
+    .dropdown-menu .dropdown-item:hover {
+      background-color: #333 !important;
+    }
     #app {
         font-family: Avenir,Helvetica,Arial,sans-serif;
         -webkit-font-smoothing: antialiased;
@@ -104,6 +116,7 @@ export default {
         color: #2c3e50;
         overflow: hidden;
     }
+  
     #nav {
         padding: 30px;
     }
@@ -126,7 +139,7 @@ export default {
         border: 0;
     }
     .light-item:hover, .light-item:active, .light-item-active{
-        background-color: rgba(60, 67, 72) !important;
+        background-color: #333 !important;
     }
     .t-align-left{
       text-align: left !important;

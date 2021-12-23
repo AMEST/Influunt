@@ -52,6 +52,6 @@ export default {
         margin-right: 5px;
     }
     .list-group-item:hover{
-        background-color: rgba(60, 67, 72) !important;
+        background-color: #333 !important;
     }
 </style>

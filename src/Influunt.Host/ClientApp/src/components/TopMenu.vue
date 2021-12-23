@@ -72,8 +72,4 @@ export default {
     .dropdown-menu .dropdown-item {
       color: #f8f9fa!important;
     }
-
-    .dropdown-menu .dropdown-item:hover {
-      background-color: rgba(60, 67, 72) !important;
-    }
 </style>

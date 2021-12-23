@@ -1,12 +1,12 @@
 <template>
-    <b-card v-if="!this.deleted" class="bg-dark" v-bind:title="this.title" v-bind:sub-title="this.date + ' on ' + this.channel">
+    <b-card v-if="!this.deleted" v-bind:title="this.title" v-bind:sub-title="this.date + ' on ' + this.channel">
         <b-card-text>
             <span v-html="this.description"></span>
         </b-card-text>
         <div style="min-height: 46px">
             <b-button v-if="this.link" v-bind:href="this.link" target="_blank" variant="outline-secondary">Read more</b-button>
-            <b-button v-if="!this.inFavorite && !this.isFavorite" variant="outline-warning" class="favorite" @click="AddToFavorite"><b-icon icon="star-fill"/></b-button>
-            <b-button v-if="this.isFavorite" variant="outline-warning" class="favorite" @click="RemoveFromFavorite"><b-icon icon="trash-fill"/></b-button>
+            <b-button v-if="!this.inFavorite && !this.isFavorite" variant="outline-warning" class="favorite-button" @click="AddToFavorite"><b-icon icon="star-fill"/></b-button>
+            <b-button v-if="this.isFavorite" variant="outline-warning" class="favorite-button" @click="RemoveFromFavorite"><b-icon icon="trash-fill"/></b-button>
         </div>
     </b-card>
 </template>
@@ -58,7 +58,6 @@ export default {
 
 <style>
     .card{
-        margin-top: 15px;
         text-align: left;
         max-width: 99%;
     }
@@ -69,9 +68,9 @@ export default {
         width: 100%!important;
     }
     .card:hover{
-        background-color: rgba(60, 67, 72) !important;
+        background-color: #333 !important;
     }
-    .favorite{
+    .favorite-button{
         display: inline-block;
         right: 15px;
         position: absolute;
