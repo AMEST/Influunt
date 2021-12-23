@@ -94,7 +94,7 @@ export default {
 
 <style>
     body{
-      background-color: #343a40 !important;
+      background-color: #232221!important;
     }
     body .bg-dark{
       background-color: #232221!important;
