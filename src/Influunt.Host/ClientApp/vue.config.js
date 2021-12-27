@@ -1,5 +1,7 @@
 module.exports = {
   pwa: {
+    themeColor: '#ffc107',
+    appleMobileWebAppStatusBarStyle: '#000000',
     workboxPluginMode: 'GenerateSW',
     workboxOptions: {
       runtimeCaching: [{
