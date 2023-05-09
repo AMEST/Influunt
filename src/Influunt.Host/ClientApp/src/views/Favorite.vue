@@ -52,12 +52,23 @@ name: 'favorite',
         self.isLoading = false
       }, offset)
     },
+    scrollTopViaBrand: function(){
+        var feed = document.getElementById("favorite-feed")
+        var brandElement = document.getElementById("brand")
+        brandElement.onclick = function(){
+            feed.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+    }
   },
   mounted: function(){
     var self = this
     var feed = document.getElementById("favorite-feed")
     feed.onscroll = function(){   
-      var wh = window.innerHeight-58.6
+      var headerNavHeight = window.document.getElementById("header-nav").clientHeight;
+      var wh = window.innerHeight-headerNavHeight
       if ((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)) {
         // eslint-disable-next-line
         console.log("Download next 10 favorites. scrollTop:"+feed.scrollTop)
@@ -66,13 +77,7 @@ name: 'favorite',
         self.InfinityFeed(self.offset)
       }
     }
-    var brandElement = document.getElementById("brand")
-    brandElement.onclick = function(){
-      feed.scrollTo({
-          top: 0,
-          behavior: "smooth"
-      });
-    }
+    setTimeout(this.scrollTopViaBrand, 1000);
   },
   created: function(){
     this.InfinityFeed(0)

@@ -79,6 +79,16 @@ export default {
     TryLoadAfterError: function(){
       this.InfinityFeed(this.offset)
       this.isError = false
+    },
+    scrollTopViaBrand: function(){
+        var feed = document.getElementById("feed")
+        var brandElement = document.getElementById("brand")
+        brandElement.onclick = function(){
+            feed.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
     }
   },
   watch:{
@@ -120,22 +130,17 @@ export default {
     var self = this
     var feed = document.getElementById("feed")
     feed.onscroll = function(){   
-      var wh = window.innerHeight-58.6
-      if ((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)) {
-        // eslint-disable-next-line
-        console.log("Download next 10 news. scrollTop:"+feed.scrollTop)
-        self.scrollMax = feed.scrollHeight
-        self.offset += 10
-        self.InfinityFeed(self.offset)
-      }
+        var headerNavHeight = window.document.getElementById("header-nav").clientHeight;
+        var wh = window.innerHeight-headerNavHeight
+        if ((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)) {
+            // eslint-disable-next-line
+            console.log("Download next 10 news. scrollTop:"+feed.scrollTop)
+            self.scrollMax = feed.scrollHeight
+            self.offset += 10
+            self.InfinityFeed(self.offset)
+        }
     }
-    var brandElement = document.getElementById("brand")
-    brandElement.onclick = function(){
-      feed.scrollTo({
-          top: 0,
-          behavior: "smooth"
-      });
-    }
+    setTimeout(this.scrollTopViaBrand, 1000);
   },
   created: function(){
     var self = this
