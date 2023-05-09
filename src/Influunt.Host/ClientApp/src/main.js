@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import './registerServiceWorker'
-import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+import { BootstrapVue, BIcon} from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Vue2TouchEvents from 'vue2-touch-events'
@@ -25,8 +25,8 @@ library.add(faGithub, faUserSecret, faSync, faExclamationTriangle)
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 // Install BootstrapVue
 Vue.use(BootstrapVue)
-// Optionally install the BootstrapVue icon components plugin
-Vue.use(IconsPlugin)
+// Use Icon component
+Vue.component('b-icon', BIcon)
 // Activate Vue2TouchEvents
 Vue.use(Vue2TouchEvents)
 Vue.config.productionTip = false

@@ -5,15 +5,19 @@
         </b-card-text>
         <div style="min-height: 46px">
             <b-button v-if="this.link" v-bind:href="this.link" target="_blank" variant="outline-secondary">Read more</b-button>
-            <b-button v-if="!this.inFavorite && !this.isFavorite" variant="outline-warning" class="favorite-button" @click="AddToFavorite"><b-icon icon="star-fill"/></b-button>
-            <b-button v-if="this.isFavorite" variant="outline-warning" class="favorite-button" @click="RemoveFromFavorite"><b-icon icon="trash-fill"/></b-button>
+            <b-button v-if="!this.inFavorite && !this.isFavorite" variant="outline-warning" class="favorite-button" @click="AddToFavorite"><b-icon-star-fill class="favorite-icon"/></b-button>
+            <b-button v-if="this.isFavorite" variant="outline-warning" class="favorite-button" @click="RemoveFromFavorite"><b-icon-trash-fill/></b-button>
         </div>
     </b-card>
 </template>
 <script>
+import {BIconStarFill, BIconTrashFill} from "bootstrap-vue";
 import InfluuntApi from "@/influunt"
 export default {
     name:"FeedItem",
+    components: {
+        BIconStarFill, BIconTrashFill
+    },
     props:{
         title:String,
         channel:String,
@@ -74,5 +78,8 @@ export default {
         display: inline-block;
         right: 15px;
         position: absolute;
+    }
+    .favorite-icon {
+        margin-bottom: 2px;
     }
 </style>

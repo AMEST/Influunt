@@ -2,7 +2,7 @@
   <div class="favorite pt-1 enable-scroll" id="favorite-feed">
     <b-row v-if="this.feed.length == 0" class="h-max align-items-center">
       <b-col class="text-center">
-        <b-icon icon="star-fill" variant="warning" font-scale="7.5"/>
+        <b-icon-star-fill icon="star-fill" variant="warning" font-scale="7.5"/>
         <br>
         <span class="text-muted">Favorits empty :(</span>
       </b-col>
@@ -17,12 +17,14 @@
 <script>
 import InfluuntApi from "@/influunt"
 import FeedItem from "@/components/FeedItem.vue"
-import LoadingBar from "@/components/LoadingBar.vue"
+const LoadingBar = () => import(/* webpackChunkName: "loading-bar-component" */"@/components/LoadingBar.vue");
+import { BIconStarFill } from "bootstrap-vue";
 export default {
 name: 'favorite',
   components:{
     FeedItem,
-    LoadingBar
+    LoadingBar,
+    BIconStarFill
   },
   data: function(){
     return {
@@ -50,12 +52,23 @@ name: 'favorite',
         self.isLoading = false
       }, offset)
     },
+    scrollTopViaBrand: function(){
+        var feed = document.getElementById("favorite-feed")
+        var brandElement = document.getElementById("brand")
+        brandElement.onclick = function(){
+            feed.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+    }
   },
   mounted: function(){
     var self = this
     var feed = document.getElementById("favorite-feed")
     feed.onscroll = function(){   
-      var wh = window.innerHeight-58.6
+      var headerNavHeight = window.document.getElementById("header-nav").clientHeight;
+      var wh = window.innerHeight-headerNavHeight
       if ((feed.scrollTop + wh > feed.scrollHeight - wh / 2) && (self.scrollMax != feed.scrollHeight)) {
         // eslint-disable-next-line
         console.log("Download next 10 favorites. scrollTop:"+feed.scrollTop)
@@ -64,13 +77,7 @@ name: 'favorite',
         self.InfinityFeed(self.offset)
       }
     }
-    var brandElement = document.getElementById("brand")
-    brandElement.onclick = function(){
-      feed.scrollTo({
-          top: 0,
-          behavior: "smooth"
-      });
-    }
+    setTimeout(this.scrollTopViaBrand, 1000);
   },
   created: function(){
     this.InfinityFeed(0)

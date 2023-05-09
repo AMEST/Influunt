@@ -48,7 +48,7 @@
 <script>
 import ChannelItem from "@/components/ChannelItem.vue"
 import InfluuntApi from "@/influunt"
-import LoadingBar from "@/components/LoadingBar.vue"
+const LoadingBar = () => import(/* webpackChunkName: "loading-bar-component" */"@/components/LoadingBar.vue");
 export default {
   components:{
     ChannelItem,

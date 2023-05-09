@@ -16,12 +16,12 @@ export default new Router({
         {
           path: '/favorite',
           name: 'favorite',
-          component: () => import( './views/Favorite.vue')
+          component: () => import( /* webpackChunkName: "favorite" */ './views/Favorite.vue')
         },
         {
           path: '/channels',
           name: 'channels',
-          component: () => import( './views/Channels.vue')
+          component: () => import( /* webpackChunkName: "channels" */ './views/Channels.vue')
         },
         {
             path: '*',

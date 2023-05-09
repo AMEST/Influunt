@@ -1,8 +1,8 @@
 <template>
     <div>
-        <b-navbar toggleable="lg" type="dark" variant="dark" class="shadow">
+        <b-navbar toggleable="lg" type="dark" variant="dark" class="shadow" id="header-nav">
             <b-container>
-                <b-icon v-if="needMenuClosable && this.isAuth" icon="list" class="menu-button" @click="changeMenuState" />
+                <b-icon-list v-if="needMenuClosable && this.isAuth" class="menu-button" @click="changeMenuState" />
                 <b-navbar-brand href="#" id="brand">
                     <img class="topicon" src="../assets/rss.png" alt="rss"/>Influunt
                 </b-navbar-brand>
@@ -22,11 +22,15 @@
 </template>
 
 <script>
+import { BIconList } from 'bootstrap-vue';
 export default {
   name: 'TopMenu',
   props:{
       isAuth: Boolean,
       email: String
+  },
+  components: {
+    BIconList,
   },
   data: function(){
     return {
