@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Influunt.Feed.Entity;
 using Influunt.Host.ViewModels;
 
 namespace Influunt.Host.Controllers
@@ -20,12 +19,16 @@ namespace Influunt.Host.Controllers
     {
         private readonly IUserService _userService;
         private readonly IChannelService _channelService;
+        private readonly IFeedService _feedService;
 
         /// <inheritdoc />
-        public ChannelController(IUserService userService, IChannelService channelService)
+        public ChannelController(IUserService userService,
+            IChannelService channelService,
+            IFeedService feedService)
         {
             _userService = userService;
             _channelService = channelService;
+            _feedService = feedService;
         }
 
         /// <summary>
@@ -92,12 +95,9 @@ namespace Influunt.Host.Controllers
 
             var channelInStore = await _channelService.Get(id);
             if (!channelInStore.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
-            {
-                Response.StatusCode = (int) HttpStatusCode.Forbidden;
-                return BadRequest();
-            }
-            var channelEntity = channel.ToEntity();
+                return Forbid();
 
+            var channelEntity = channel.ToEntity();
             channelEntity.Id = channelInStore.Id;
             channelEntity.UserId = channelInStore.UserId;
             await _channelService.Update(user, channelEntity);
@@ -109,11 +109,17 @@ namespace Influunt.Host.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("{id}")]
-        public async Task Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             var user = await _userService.GetCurrentUser();
             var channel = await _channelService.Get(id);
+             if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
+                return Forbid();
             await _channelService.Remove(user, channel);
+#pragma warning disable 4014
+            _feedService.RemoveFeedByChannel(user, channel);
+#pragma warning restore 4014
+            return Ok();
         }
     }
 }

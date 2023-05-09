@@ -1,4 +1,5 @@
 ﻿using Influunt.Feed.Entity;
+using MongoDB.Bson;
 using Skidbladnir.Repository.MongoDB;
 
 namespace Influunt.Storage.Entity
@@ -8,6 +9,7 @@ namespace Influunt.Storage.Entity
         public FeedChannelMap()
         {
             ToCollection("FeedChannel");
+            MapId(x => x.Id, BsonType.String);
         }
     }
 }

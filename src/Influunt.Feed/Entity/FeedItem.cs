@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Web;
+using Skidbladnir.Repository.Abstractions;
 
 namespace Influunt.Feed.Entity
 {
-    public class FeedItem
+    public class FeedItem : IHasId<string>
     {
+        public string Id { get; set; }
         public string Title { get; set; }
         public string Link { get; set; }
         public string Description { get; set; }
         public DateTime PubDate { get; set; }
-        public string ChannelName { get; set; }
+        public string UserId { get; set; }
+        public string ChannelId { get; set; }
+        public string Hash { get; set; }
 
         public FeedItem NormalizeDescription()
         {

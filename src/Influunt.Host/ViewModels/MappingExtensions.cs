@@ -27,30 +27,32 @@ namespace Influunt.Host.ViewModels
         /// <summary>
         /// FeedItem to FeedItemViewModel mapping
         /// </summary>
-        public static IEnumerable<FeedItemViewModel> ToModel(this IEnumerable<FeedItem> feedItem)
+        public static IEnumerable<FeedItemViewModel> ToModel(this IEnumerable<FeedItem> feedItem, IEnumerable<FeedChannel> channels)
         {
             return feedItem.Select(x => new FeedItemViewModel
             {
-                ChannelName = x.ChannelName,
+                ChannelName = channels.FirstOrDefault(c => c.Id == x.ChannelId)?.Name,
                 Date = x.PubDate,
                 Description = x.Description,
                 Link = x.Link,
-                Title = x.Title
+                Title = x.Title,
+                ItemHash = x.Hash
             });
         }
 
         /// <summary>
-        /// FeedItemViewModel to FeedItem mapping
+        /// FeedItemViewModel to FavoriteFeedItem mapping
         /// </summary>
-        public static FeedItem ToEntity(this FeedItemViewModel feedViewItem)
+        public static FavoriteFeedItem ToEntity(this FeedItemViewModel feedViewItem)
         {
-            return new FeedItem
+            return new FavoriteFeedItem
             {
-                ChannelName = feedViewItem.ChannelName,
                 PubDate = feedViewItem.Date,
                 Description = feedViewItem.Description,
                 Link = feedViewItem.Link,
-                Title = feedViewItem.Title
+                Title = feedViewItem.Title,
+                Hash = feedViewItem.ItemHash,
+                ChannelName = feedViewItem.ChannelName
             };
         }
 
@@ -61,12 +63,13 @@ namespace Influunt.Host.ViewModels
         {
             return feedItem.Select(x => new FavoriteFeedItemViewModel
             {
-                ChannelName = x.ChannelName,
                 Date = x.PubDate,
                 Description = x.Description,
                 Link = x.Link,
                 Title = x.Title,
-                Id = x.Id
+                Id = x.Id,
+                ItemHash = x.Hash,
+                ChannelName = x.ChannelName
             });
         }
 

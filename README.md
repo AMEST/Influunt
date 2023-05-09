@@ -8,6 +8,10 @@
   - [Description](#description)
   - [Features](#features)
   - [Self-hosted Requirements](#self-hosted-requirements)
+  - [Configurations](#configurations)
+    - [Authentication](#authentication)
+    - [Database](#database)
+    - [Feed](#feed)
   - [Screenshots](#screenshots)
   - [Using in docker](#using-in-docker)
 ## Links
@@ -19,18 +23,40 @@ In order to use the service, you need to log in (so that the user can add his ch
 
 ## Features
 1. Authorization: Google and Guest (for try service or local / self-hosted using)
-1. Infinite news feed (while has news inside channels)
-1. Receiving news feed in parts (10 news)
-1. Favorites (add/remove)
-1. Channels (add/edit/change visible in feed/remove)
-1. PWA functional with offline mode (request caching)
-1. Automatic background update of news feed to cache for active accounts
-1. Redis distributed cache (faster retrieval of news from cache)
+2. Infinite news feed (while added news from channels in user feed exists)
+3. Receiving news feed in parts (10 news)
+4. Favorites (add/remove)
+5. Channels (add/edit/change visible in feed/remove)
+6. PWA functional with offline mode (request caching)
+7. Automatic background fetch new news from channels and push to user feed for active accounts
+8. Redis distributed cache (cache remotes channels)
 
 ## Self-hosted Requirements
 * MongoDB - For storing user data (channels, favorites) and for aspnet core secure storage.
 * AspNet Core 3.1 runtime or Docker for service start
 * Optional reverse proxy for https connection
+
+## Configurations 
+
+All configuration may be configured in `appsettings.json` or in Environment variables
+
+### Authentication
+
+* `Authentication:Google:ClientSecret` - client id in google 
+* `Authentication:Google:ClientId` - client secret in google 
+
+### Database
+
+Influunt use MongoDB as persistent data storage and Redis for faster distributed cache.
+
+*  `ConnectionStrings:Mongo:ConnectionString` - mongo connection string (example: `mongodb://app:password@localhost/influunt?authSource=admin`)
+*  `ConnectionStrings:Redis:ConnectionString` - connection string for Redis cache type
+
+### Feed
+
+* `FeedCrawler:Enabled` - enable background channels fetch (default: `true`). _In the future, can be disabled in api, and enabled in external worker_
+* `FeedCrawler:FetchInterval` - interval between fetching news from channels (default: `00:30:00` (30min))
+* `FeedCrawler:LastActivityDaysAgo` - Minimal user last activity date, for fetch news. If user don't use service more then n days, don't fetch news from user channel (default 93 days (~3 month))
 
 ## Screenshots
 |                                                                                            |                                                                                           |

@@ -37,7 +37,9 @@ namespace Influunt.Host.Controllers
         public async Task<IEnumerable<FeedItemViewModel>> Get([FromQuery] int? offset)
         {
             var user = await _userService.GetCurrentUser();
-            return (await _feedService.GetFeed(user, offset)).ToModel();
+            var feed = await _feedService.GetFeed(user, offset);
+            var userChannels = await _channelService.GetUserChannels(user);
+            return feed.ToModel(userChannels);
         }
 
         // GET: api/Feed/5
@@ -53,7 +55,8 @@ namespace Influunt.Host.Controllers
         {
             var user = await _userService.GetCurrentUser();
             var channel = await _channelService.Get(id);
-            return (await _feedService.GetFeed(user, channel, offset)).ToModel();
+            var feed = await _feedService.GetFeed(user, channel, offset);
+            return feed.ToModel(new[] { channel });
         }
     }
 }
