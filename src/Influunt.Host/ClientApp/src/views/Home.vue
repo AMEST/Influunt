@@ -6,7 +6,7 @@
     <br>
     <b-row v-if="this.feed.length == 0" class="h-max align-items-center">
       <b-col class="text-center">
-        <b-icon icon="rss" variant="warning" font-scale="7.5"/>
+        <b-icon-rss variant="warning" font-scale="7.5"/>
         <br>
         <span class="text-muted">News feed empty :(</span>
       </b-col>
@@ -22,14 +22,16 @@
 <script>
 import InfluuntApi from "@/influunt"
 import FeedItem from "@/components/FeedItem.vue"
-import LoadingBar from "@/components/LoadingBar.vue"
-import ErrorBar from "@/components/ErrorBar.vue"
+import { BIconRss } from "bootstrap-vue";
+const LoadingBar = () => import(/* webpackChunkName: "loading-bar-component" */"@/components/LoadingBar.vue");
+const ErrorBar = () => import(/* webpackChunkName: "error-bar-component" */"@/components/ErrorBar.vue");
 export default {
   name: 'home',
   components:{
     FeedItem,
     LoadingBar,
-    ErrorBar
+    ErrorBar,
+    BIconRss
   },
   data: function(){
     return {
