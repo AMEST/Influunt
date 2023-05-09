@@ -5,26 +5,26 @@ using System.Threading.Tasks;
 namespace Influunt.Feed
 {
     /// <summary>
-    /// Сервис каналов
+    /// Channel service
     /// </summary>
     public interface IChannelService
     {
         /// <summary>
-        /// Получение канала по Id
+        /// Get channel by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         Task<FeedChannel> Get(string id);
 
         /// <summary>
-        /// Добавление канала
+        /// Add chammel
         /// </summary>
         /// <param name="channel"></param>
         /// <returns></returns>
         Task<FeedChannel> Add(FeedChannel channel);
 
         /// <summary>
-        /// Удаление канала
+        /// Remove channel
         /// </summary>
         /// <param name="user"></param>
         /// <param name="channel"></param>
@@ -32,7 +32,7 @@ namespace Influunt.Feed
         Task Remove(User user, FeedChannel channel);
 
         /// <summary>
-        /// Обновление информации канала
+        /// Update channel
         /// </summary>
         /// <param name="user"></param>
         /// <param name="channel"></param>
@@ -40,7 +40,7 @@ namespace Influunt.Feed
         Task Update(User user, FeedChannel channel);
 
         /// <summary>
-        /// Получение списка каналов пользователя
+        /// Get user channels
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>

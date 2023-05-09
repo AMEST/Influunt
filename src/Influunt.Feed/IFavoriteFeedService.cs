@@ -5,12 +5,12 @@ using Influunt.Feed.Entity;
 namespace Influunt.Feed
 {
     /// <summary>
-    /// Сервис избранных постов
+    ///     Favorite feed service
     /// </summary>
     public interface IFavoriteFeedService
     {
         /// <summary>
-        /// Добавление поста в избранное
+        /// Add item to favorites
         /// </summary>
         /// <param name="user"></param>
         /// <param name="favorite"></param>
@@ -18,7 +18,7 @@ namespace Influunt.Feed
         Task<FavoriteFeedItem> Add(User user, FeedItem favorite);
 
         /// <summary>
-        /// Удаление поста из избранного
+        /// Remove from favorites
         /// </summary>
         /// <param name="user"></param>
         /// <param name="id"></param>
@@ -26,7 +26,7 @@ namespace Influunt.Feed
         Task Remove(User user, string id);
 
         /// <summary>
-        /// Получение избранных постов пользователя
+        /// Get all favorites from user
         /// </summary>
         Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset);
     }

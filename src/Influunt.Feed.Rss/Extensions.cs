@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -28,18 +29,15 @@ namespace Influunt.Feed.Rss
             return cache.SetAsync(key, Encoding.UTF8.GetBytes(serializedEntry), options);
         }
 
-
-        public static IEnumerable<FeedItem> GetChunkedFeed(this IEnumerable<FeedItem> feed, int? offset, int count)
-        {
-            return offset == null ? feed : feed.Skip(offset.Value).Take(count);
-        }
+        public static List<T> AsList<T>(this IEnumerable<T> source)
+            => (source == null || source is List<T>) ? (List<T>)source : source.ToList();
 
         public static bool IsAtomRss(this string xml)
         {
             return xml.Contains("xmlns=\"http://www.w3.org/2005/Atom\"");
         }
 
-        public static List<FeedItem> FeedFromRss(this string xml, FeedChannel channel)
+        public static List<FeedItem> FeedFromRss(this string xml)
         {
             using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xml ?? "")))
             {
@@ -51,9 +49,8 @@ namespace Influunt.Feed.Rss
                     {
                         Title = rssItem.Title,
                         Description = rssItem.Description,
-                        PubDate = DateTime.UtcNow.AddDays(-31),
+                        PubDate = DateTime.UtcNow,
                         Link = rssItem.Link?.ToString(),
-                        ChannelName = channel.Name ?? ""
                     };
 
                     if (DateTime.TryParse(rssItem.PubDate, out var pubDate))
@@ -64,7 +61,7 @@ namespace Influunt.Feed.Rss
             }
         }
 
-        public static List<FeedItem> FeedFromAtomRss(this string xml, FeedChannel channel)
+        public static List<FeedItem> FeedFromAtomRss(this string xml)
         {
             using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xml ?? "")))
             {
@@ -78,9 +75,8 @@ namespace Influunt.Feed.Rss
                         Description = string.IsNullOrEmpty(rssItem.Content?.Text)
                             ? rssItem.Summary
                             : rssItem.Content.Text,
-                        PubDate = DateTime.UtcNow.AddDays(-31),
+                        PubDate = DateTime.UtcNow,
                         Link = rssItem.Link?.ToString(),
-                        ChannelName = channel.Name ?? ""
                     };
 
                     if (DateTime.TryParse(rssItem.Published, out var pubDate))

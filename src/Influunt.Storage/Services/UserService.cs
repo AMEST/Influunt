@@ -1,16 +1,14 @@
 ﻿using Influunt.Feed;
 using Influunt.Feed.Entity;
 using Microsoft.AspNetCore.Http;
-using MongoDB.Bson;
 using Skidbladnir.Repository.Abstractions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Influunt.Storage.Services
 {
-    public class UserService : IUserService
+    internal class UserService : IUserService
     {
         private readonly IRepository<User> _userRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -24,7 +22,7 @@ namespace Influunt.Storage.Services
 
         public async Task<IEnumerable<User>> GetUsers()
         {
-            return await Task.Run(() => _userRepository.GetAll().ToList());
+            return await _userRepository.GetAll().ToArrayAsync();
         }
 
         public async Task<User> GetCurrentUser()
@@ -44,19 +42,17 @@ namespace Influunt.Storage.Services
 
         public Task<User> GetUserById(string id)
         {
-            return Task.Run(() => _userRepository.GetAll().SingleOrDefault(x => x.Id == id));
+            return _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<User> GetUserByEmail(string email)
         {
-            var user = await Task.Run(() =>
-                _userRepository.GetAll().SingleOrDefault(u => u.Email.ToLower() == email.ToLower()));
+            var user = await _userRepository.GetAll().FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
             return user;
         }
 
         public async Task<User> Add(User user)
         {
-            user.Id = ObjectId.GenerateNewId().ToString();
             user.LastActivity = DateTime.UtcNow;
             await _userRepository.Create(user);
             return user;

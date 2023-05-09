@@ -1,10 +1,9 @@
-﻿using Skidbladnir.Repository.Abstractions;
+﻿using System;
 
 namespace Influunt.Feed.Entity
 {
-    public class FavoriteFeedItem : FeedItem, IHasId<string>
+    public class FavoriteFeedItem : FeedItem
     {
-        public string UserId { get; set; }
-        public string Id { get; set; }
+        public string ChannelName { get; set; }
     }
 }

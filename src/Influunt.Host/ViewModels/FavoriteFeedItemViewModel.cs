@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Influunt.Host.ViewModels
 {
@@ -37,13 +34,6 @@ namespace Influunt.Host.ViewModels
         /// <summary>
         /// News Unique identifier
         /// </summary>
-        public string ItemHash => ComputeHash();
-
-        private string ComputeHash()
-        {
-            using var sha256 = SHA256.Create();
-            var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes($"{Title}.{Description}.{ChannelName}"));
-            return string.Concat(hash.Select(b => b.ToString("X2")));
-        }
+        public string ItemHash {get; set;}
     }
 }

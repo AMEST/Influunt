@@ -18,7 +18,7 @@ namespace Influunt.Feed.Rss
             _logger = logger;
         }
 
-        public async Task<List<FeedItem>> GetFeed(FeedChannel channel)
+        public async Task<IEnumerable<FeedItem>> GetFeed(FeedChannel channel)
         {
             try
             {
@@ -26,8 +26,8 @@ namespace Influunt.Feed.Rss
                 {
                     var xmlRss = await result.Content.ReadAsStringAsync();
                     return xmlRss.IsAtomRss()
-                        ? xmlRss.FeedFromAtomRss(channel)
-                        : xmlRss.FeedFromRss(channel);
+                        ? xmlRss.FeedFromAtomRss()
+                        : xmlRss.FeedFromRss();
                 }
             }
             catch (Exception e)
@@ -35,7 +35,7 @@ namespace Influunt.Feed.Rss
                 _logger.LogError(
                     "Can not get rss feed from \nchannel: {channelName}\nurl: {channelUrl}\n with error: {message} ",
                     channel.Name, channel.Url, e.Message);
-                return new List<FeedItem>();
+                return Array.Empty<FeedItem>();
             }
         }
     }

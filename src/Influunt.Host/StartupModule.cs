@@ -19,7 +19,8 @@ namespace Influunt.Host
 
         public override void Configure(IServiceCollection services)
         {
-            services.UseDataProtection();
+            services.AddDataProtection()
+                .PersistKeysToMongoDb(Configuration.AppConfiguration["ConnectionStrings:Mongo:ConnectionString"]);
             ConfigureDistributedCache(services);
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
@@ -29,7 +30,7 @@ namespace Influunt.Host
             var redisConfiguration = Configuration.Get<RedisConfiguration>();
             if(string.IsNullOrWhiteSpace(redisConfiguration?.ConnectionString))
             {
-                services.UseMongoDistributedCache();
+                services.AddMongoDistributedCache(Configuration.AppConfiguration["ConnectionStrings:Mongo:ConnectionString"]);
             }
             else
             {

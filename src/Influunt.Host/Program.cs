@@ -1,9 +1,10 @@
 using System.Threading.Tasks;
-using Influunt.Feed.Rss;
+using Influunt.Feed.Crawler;
 using Influunt.Host.Configurations;
 using Influunt.Storage;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Skidbladnir.Modules;
 
@@ -22,11 +23,15 @@ namespace Influunt.Host
                 {
                     webBuilder.UseStartup<Startup>();
                 })
+                .ConfigureServices((ctx, services) => {
+                    services.AddOptions();
+                    services.Configure<CrawlerOptions>(ctx.Configuration.GetSection("FeedCrawler"));
+                    var crawlerEnabled = ctx.Configuration.GetSection("FeedCrawler:Enabled").Get<bool>();
+                    if(crawlerEnabled)
+                        services.AddHostedService<FeedCrawlerBackgroundWorker>();
+                })
                 .UseSkidbladnirModules<StartupModule>(configuration =>
                 {
-                    var rssFeedConfiguration = configuration.AppConfiguration.GetSection("FeedService")
-                        .Get<RssFeedServiceConfiguration>();
-                    configuration.Add(rssFeedConfiguration);
                     var storageConfiguration = configuration.AppConfiguration.GetSection("ConnectionStrings:Mongo").Get<StorageConfiguration>();
                     configuration.Add(storageConfiguration);
                     var redisConfiguration = configuration.AppConfiguration.GetSection("ConnectionStrings:Redis").Get<RedisConfiguration>();

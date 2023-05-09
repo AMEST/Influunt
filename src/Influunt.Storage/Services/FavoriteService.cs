@@ -1,6 +1,5 @@
 ﻿using Influunt.Feed;
 using Influunt.Feed.Entity;
-using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ using Skidbladnir.Repository.Abstractions;
 
 namespace Influunt.Storage.Services
 {
-    public class FavoriteService : IFavoriteFeedService
+    internal class FavoriteService : IFavoriteFeedService
     {
         private readonly IRepository<FavoriteFeedItem> _favoriteRepository;
 
@@ -27,8 +26,7 @@ namespace Influunt.Storage.Services
                 Link = favorite.Link,
                 Title = favorite.Title,
                 UserId = user.Id,
-                ChannelName = favorite.ChannelName,
-                Id = ObjectId.GenerateNewId().ToString()
+                ChannelId = favorite.ChannelId
             };
             await _favoriteRepository.Create(favoriteItem);
             return favoriteItem;
@@ -36,16 +34,16 @@ namespace Influunt.Storage.Services
 
         public async Task Remove(User user, string id)
         {
-            var favorite = _favoriteRepository.GetAll().SingleOrDefault(x=>x.Id == id);
+            var favorite = await _favoriteRepository.GetAll().FirstOrDefaultAsync(x=>x.Id == id);
             if (favorite == null || !favorite.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
                 return;
 
             await _favoriteRepository.Delete(favorite);
         }
 
-        public Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset)
+        public async Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset)
         {
-            return Task.Run(() => GetFavorites(user, offset).ToList().AsEnumerable());
+            return await GetFavorites(user, offset).ToArrayAsync();
         }
 
         private IQueryable<FavoriteFeedItem> GetFavorites(User user, int? offset)
