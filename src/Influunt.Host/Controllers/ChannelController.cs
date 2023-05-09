@@ -109,14 +109,17 @@ namespace Influunt.Host.Controllers
         /// </summary>
         /// <param name="id"></param>
         [HttpDelete("{id}")]
-        public async Task Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             var user = await _userService.GetCurrentUser();
             var channel = await _channelService.Get(id);
+             if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
+                return Forbid();
             await _channelService.Remove(user, channel);
 #pragma warning disable 4014
             _feedService.RemoveFeedByChannel(user, channel);
 #pragma warning restore 4014
+            return Ok();
         }
     }
 }
