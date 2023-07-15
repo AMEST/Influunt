@@ -70,6 +70,7 @@ export default {
     .jbg {
         background-image: url("/img/triangulated-bg.png");
         background-position: center;
+        height: 100vh;
     }
     .fork-me{
         position: fixed;
