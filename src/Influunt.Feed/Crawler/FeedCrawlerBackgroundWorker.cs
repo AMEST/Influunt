@@ -51,7 +51,7 @@ public class FeedCrawlerBackgroundWorker : BackgroundService
                     break;
                 _logger.LogError(e, "Error in Feed Crawler Background Worker when fetch feeds.");
             }
-            await Task.Delay(_options.FetchInterval);
+            await Task.Delay(_options.FetchInterval, stoppingToken);
         }
         _logger.LogInformation("Feed Crawler Background Worker is stopping.");
 
@@ -66,7 +66,7 @@ public class FeedCrawlerBackgroundWorker : BackgroundService
         {
             token.ThrowIfCancellationRequested();
             var channels = await Try.DoAsync(() => _channelService.GetUserChannels(user));
-            if (channels == null)
+            if (channels is null)
                 continue;
             try
             {
@@ -86,7 +86,7 @@ public class FeedCrawlerBackgroundWorker : BackgroundService
     {
         token.ThrowIfCancellationRequested();
         var remoteFeedProvider = _feedSourceProviders.FirstOrDefault(x => x.CanProcessChannel(channel));
-        if (remoteFeedProvider == null)
+        if (remoteFeedProvider is null)
             return;
         var remoteFeed = await remoteFeedProvider.GetRemoteFeed(channel);
         var count = await _feedService.TryAddToFeed(user, remoteFeed, channel);

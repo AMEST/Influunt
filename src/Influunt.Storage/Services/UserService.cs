@@ -6,66 +6,64 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Influunt.Storage.Services
+namespace Influunt.Storage.Services;
+
+internal class UserService : IUserService
 {
-    internal class UserService : IUserService
+    private readonly IRepository<User> _userRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UserService(IRepository<User> userRepository, IHttpContextAccessor httpContextAccessor)
     {
-        private readonly IRepository<User> _userRepository;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        _userRepository = userRepository;
+        _httpContextAccessor = httpContextAccessor;
+    }
 
-        public UserService(IRepository<User> userRepository, IHttpContextAccessor httpContextAccessor)
-        {
-            _userRepository = userRepository;
-            _httpContextAccessor = httpContextAccessor;
-        }
+    public async Task<IEnumerable<User>> GetUsers()
+    {
+        return await _userRepository.GetAll().ToArrayAsync();
+    }
 
+    public async Task<User> GetCurrentUser()
+    {
+        var contextUser = User.FromIdentity(_httpContextAccessor.HttpContext.User);
+        if (contextUser is null)
+            return null;
 
-        public async Task<IEnumerable<User>> GetUsers()
-        {
-            return await _userRepository.GetAll().ToArrayAsync();
-        }
+        var user = await GetUserByEmail(contextUser.Email);
 
-        public async Task<User> GetCurrentUser()
-        {
-            var contextUser = User.FromIdentity(_httpContextAccessor.HttpContext.User);
-            if (contextUser == null)
-                return null;
+        if (user is null) return await Add(contextUser);
 
-            var user = await GetUserByEmail(contextUser.Email);
+        user.LastActivity = DateTime.UtcNow;
+        await Update(user);
+        return user;
+    }
 
-            if (user == null) return await Add(contextUser);
+    public Task<User> GetUserById(string id)
+    {
+        return _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+    }
 
-            user.LastActivity = DateTime.UtcNow;
-            await Update(user);
-            return user;
-        }
+    public async Task<User> GetUserByEmail(string email)
+    {
+        var user = await _userRepository.GetAll().FirstOrDefaultAsync(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        return user;
+    }
 
-        public Task<User> GetUserById(string id)
-        {
-            return _userRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
-        }
+    public async Task<User> Add(User user)
+    {
+        user.LastActivity = DateTime.UtcNow;
+        await _userRepository.Create(user);
+        return user;
+    }
 
-        public async Task<User> GetUserByEmail(string email)
-        {
-            var user = await _userRepository.GetAll().FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
-            return user;
-        }
+    public Task Update(User updatedUser)
+    {
+        return _userRepository.Update(updatedUser);
+    }
 
-        public async Task<User> Add(User user)
-        {
-            user.LastActivity = DateTime.UtcNow;
-            await _userRepository.Create(user);
-            return user;
-        }
-
-        public Task Update(User updatedUser)
-        {
-            return _userRepository.Update(updatedUser);
-        }
-
-        public Task Remove(User user)
-        {
-            return _userRepository.Delete(user);
-        }
+    public Task Remove(User user)
+    {
+        return _userRepository.Delete(user);
     }
 }

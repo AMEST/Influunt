@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Skidbladnir.Modules;
@@ -60,7 +59,7 @@ public class WebModule : Module
                 {
                     Version = "v1",
                     Title = "Influunt API",
-                    Description = "Influunt (Rss agregator) Api"
+                    Description = "Influunt (Rss aggregator) Api"
                 });
                 c.CustomSchemaIds(type => type.FullName);
                 var filePath = Path.Combine(AppContext.BaseDirectory, "Influunt.Host.xml");

@@ -16,7 +16,7 @@ namespace Influunt.Storage;
 
 public class StorageModule : RunnableModule
 {
-    public override Type[] DependsModules => new []{ typeof(HashMigrationWorkerModule)};
+    public override Type[] DependsModules => [typeof(HashMigrationWorkerModule)];
     public override void Configure(IServiceCollection services)
     {
         // Register conventions
@@ -66,7 +66,7 @@ public class StorageModule : RunnableModule
         }
     }
 
-    private async Task CreateFeedIndexes(BaseMongoDbContext baseMongoContext)
+    private static async Task CreateFeedIndexes(BaseMongoDbContext baseMongoContext)
     {
         var collection = baseMongoContext.GetCollection<FeedItem>();
         var userIdAndChannelIdAndPubDateDefinition = Builders<FeedItem>.IndexKeys
@@ -87,7 +87,7 @@ public class StorageModule : RunnableModule
         }));
     }
 
-    private async Task CreateFavoriteIndexes(BaseMongoDbContext baseMongoContext)
+    private static async Task CreateFavoriteIndexes(BaseMongoDbContext baseMongoContext)
     {
         var collection = baseMongoContext.GetCollection<FavoriteFeedItem>();
         var userIdAndPubDateDefinition = Builders<FavoriteFeedItem>.IndexKeys
@@ -99,7 +99,7 @@ public class StorageModule : RunnableModule
         }));
     }
 
-    private async Task CreateChannelIndexes(BaseMongoDbContext baseMongoContext)
+    private static async Task CreateChannelIndexes(BaseMongoDbContext baseMongoContext)
     {
         var collection = baseMongoContext.GetCollection<FeedChannel>();
         var userIdKeyDefinition = Builders<FeedChannel>.IndexKeys.Ascending(x => x.UserId);
@@ -109,7 +109,7 @@ public class StorageModule : RunnableModule
         }));
     }
 
-    private async Task CreateUserIndexes(BaseMongoDbContext baseMongoContext)
+    private static async Task CreateUserIndexes(BaseMongoDbContext baseMongoContext)
     {
         var collection = baseMongoContext.GetCollection<User>();
         var emailKeyDefinition = Builders<User>.IndexKeys.Ascending(x => x.Email);

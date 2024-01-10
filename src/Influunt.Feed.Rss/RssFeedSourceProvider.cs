@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using Influunt.Feed.Entity;
 
@@ -42,11 +41,11 @@ internal class RssFeedSourceProvider : IFeedSourceProvider, IDisposable
     private async Task<List<FeedItem>> GetFeedFromChannelCached(FeedChannel channel)
     {
         var channelFeed = await _distributedCache.GetAsync<List<FeedItem>>($"channel_url_{channel.Url}");
-        if (channelFeed != null && channelFeed.Count != 0)
+        if (channelFeed is not null && channelFeed.Count != 0)
             return channelFeed;
 
         channelFeed = (await _rssClient.GetFeed(channel)).AsList();
-        if (channelFeed.Any())
+        if (channelFeed.Count != 0)
             await _distributedCache.SetAsync($"channel_url_{channel.Url}", channelFeed, new DistributedCacheEntryOptions()
             {
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)

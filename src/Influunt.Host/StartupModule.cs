@@ -15,7 +15,7 @@ namespace Influunt.Host;
 
 public class StartupModule : Module
 {
-    public override Type[] DependsModules => new[] {typeof(WebModule), typeof(StorageModule), typeof(RssModule)};
+    public override Type[] DependsModules => [typeof(WebModule), typeof(StorageModule), typeof(RssModule)];
 
     public override void Configure(IServiceCollection services)
     {

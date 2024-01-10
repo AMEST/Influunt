@@ -62,27 +62,25 @@ public static class Extensions
 
     public static List<FeedItem> FeedFromAtomRss(this string xml)
     {
-        using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xml ?? "")))
+        using var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(xml ?? ""));
+        var ser = new XmlSerializer(typeof(Feed));
+        var rssBody = (Feed)ser.Deserialize(memoryStream);
+        return rssBody.Entry.Select(rssItem =>
         {
-            var ser = new XmlSerializer(typeof(Feed));
-            var rssBody = (Feed)ser.Deserialize(memoryStream);
-            return rssBody.Entry.Select(rssItem =>
+            var item = new FeedItem
             {
-                var item = new FeedItem
-                {
-                    Title = rssItem.Title,
-                    Description = string.IsNullOrEmpty(rssItem.Content?.Text)
-                        ? rssItem.Summary
-                        : rssItem.Content.Text,
-                    PubDate = DateTime.UtcNow,
-                    Link = rssItem.Link?.ToString(),
-                };
+                Title = rssItem.Title,
+                Description = string.IsNullOrEmpty(rssItem.Content?.Text)
+                    ? rssItem.Summary
+                    : rssItem.Content.Text,
+                PubDate = DateTime.UtcNow,
+                Link = rssItem.Link?.ToString(),
+            };
 
-                if (DateTime.TryParse(rssItem.Published, out var pubDate))
-                    item.PubDate = pubDate;
+            if (DateTime.TryParse(rssItem.Published, out var pubDate))
+                item.PubDate = pubDate;
 
-                return item.NormalizeDescription();
-            }).ToList();
-        }
+            return item.NormalizeDescription();
+        }).ToList();
     }
 }
