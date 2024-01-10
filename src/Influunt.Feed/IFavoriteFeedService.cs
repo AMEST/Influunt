@@ -2,32 +2,31 @@
 using System.Threading.Tasks;
 using Influunt.Feed.Entity;
 
-namespace Influunt.Feed
+namespace Influunt.Feed;
+
+/// <summary>
+///     Favorite feed service
+/// </summary>
+public interface IFavoriteFeedService
 {
     /// <summary>
-    ///     Favorite feed service
+    /// Add item to favorites
     /// </summary>
-    public interface IFavoriteFeedService
-    {
-        /// <summary>
-        /// Add item to favorites
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="favorite"></param>
-        /// <returns></returns>
-        Task<FavoriteFeedItem> Add(User user, FeedItem favorite);
+    /// <param name="user"></param>
+    /// <param name="favorite"></param>
+    /// <returns></returns>
+    Task<FavoriteFeedItem> Add(User user, FeedItem favorite);
 
-        /// <summary>
-        /// Remove from favorites
-        /// </summary>
-        /// <param name="user"></param>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Task Remove(User user, string id);
+    /// <summary>
+    /// Remove from favorites
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task Remove(User user, string id);
 
-        /// <summary>
-        /// Get all favorites from user
-        /// </summary>
-        Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset);
-    }
+    /// <summary>
+    /// Get all favorites from user
+    /// </summary>
+    Task<IEnumerable<FavoriteFeedItem>> GetUserFavorites(User user, int? offset);
 }

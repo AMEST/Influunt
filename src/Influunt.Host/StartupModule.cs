@@ -11,33 +11,32 @@ using Skidbladnir.Caching.Distributed.MongoDB;
 using Skidbladnir.DataProtection.MongoDb;
 using Skidbladnir.Modules;
 
-namespace Influunt.Host
+namespace Influunt.Host;
+
+public class StartupModule : Module
 {
-    public class StartupModule : Module
+    public override Type[] DependsModules => new[] {typeof(WebModule), typeof(StorageModule), typeof(RssModule)};
+
+    public override void Configure(IServiceCollection services)
     {
-        public override Type[] DependsModules => new[] {typeof(WebModule), typeof(StorageModule), typeof(RssModule)};
+        services.AddDataProtection()
+            .PersistKeysToMongoDb(Configuration.AppConfiguration["ConnectionStrings:Mongo:ConnectionString"]);
+        ConfigureDistributedCache(services);
+        services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+    }
 
-        public override void Configure(IServiceCollection services)
+    private void ConfigureDistributedCache(IServiceCollection services)
+    {
+        var redisConfiguration = Configuration.Get<RedisConfiguration>();
+        if(string.IsNullOrWhiteSpace(redisConfiguration?.ConnectionString))
         {
-            services.AddDataProtection()
-                .PersistKeysToMongoDb(Configuration.AppConfiguration["ConnectionStrings:Mongo:ConnectionString"]);
-            ConfigureDistributedCache(services);
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddMongoDistributedCache(Configuration.AppConfiguration["ConnectionStrings:Mongo:ConnectionString"]);
         }
-
-        private void ConfigureDistributedCache(IServiceCollection services)
+        else
         {
-            var redisConfiguration = Configuration.Get<RedisConfiguration>();
-            if(string.IsNullOrWhiteSpace(redisConfiguration?.ConnectionString))
-            {
-                services.AddMongoDistributedCache(Configuration.AppConfiguration["ConnectionStrings:Mongo:ConnectionString"]);
-            }
-            else
-            {
-                services.AddStackExchangeRedisCache(c => c.Configuration = redisConfiguration.ConnectionString)
-                        .Decorate<IDistributedCache, RedisCacheFallbackDecorator>();
-            }
-                
+            services.AddStackExchangeRedisCache(c => c.Configuration = redisConfiguration.ConnectionString)
+                    .Decorate<IDistributedCache, RedisCacheFallbackDecorator>();
         }
+            
     }
 }

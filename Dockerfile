@@ -4,7 +4,7 @@ COPY . /src
 RUN echo $(git describe --tags --always 2>/dev/null | sed 's/-g[a-z0-9]\{7\}//') > /version ;\
     echo "Version: "$(cat /version)
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 COPY . /build
 COPY --from=version /version /build/version
 WORKDIR /build
@@ -22,7 +22,7 @@ RUN sed -i -e "s/<Version>0-develop<\/Version>/<Version>$(cat version | cut -c2-
 
 
 ######## Influunt Host
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim as influunt
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim as influunt
 COPY --from=build /app /influunt
 WORKDIR /influunt
 EXPOSE 80
