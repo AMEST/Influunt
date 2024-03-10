@@ -46,7 +46,9 @@ internal class UserService : IUserService
 
     public async Task<User> GetUserByEmail(string email)
     {
-        var user = await _userRepository.GetAll().FirstOrDefaultAsync(u => u.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+        var user = await _userRepository
+            .GetAll()
+            .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
         return user;
     }
 
