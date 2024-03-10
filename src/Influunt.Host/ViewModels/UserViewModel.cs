@@ -1,17 +1,16 @@
-﻿namespace Influunt.Host.ViewModels
+﻿namespace Influunt.Host.ViewModels;
+
+/// <summary>
+/// User contract
+/// </summary>
+public class UserViewModel
 {
     /// <summary>
-    /// User contract
+    /// User email
     /// </summary>
-    public class UserViewModel
-    {
-        /// <summary>
-        /// User email
-        /// </summary>
-        public string Email { get; set; }
-        /// <summary>
-        /// User name
-        /// </summary>
-        public string Name { get; set; }
-    }
+    public string Email { get; set; }
+    /// <summary>
+    /// User name
+    /// </summary>
+    public string Name { get; set; }
 }

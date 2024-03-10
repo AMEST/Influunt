@@ -1,7 +1,6 @@
-namespace Influunt.Host.Configurations
+namespace Influunt.Host.Configurations;
+
+public class RedisConfiguration
 {
-    public class RedisConfiguration
-    {
-        public string ConnectionString { get; set; }
-    }
+    public string ConnectionString { get; set; }
 }

@@ -5,38 +5,37 @@ using System.Threading.Tasks;
 using Influunt.Feed.Entity;
 using Microsoft.Extensions.Logging;
 
-namespace Influunt.Feed.Rss
+namespace Influunt.Feed.Rss;
+
+internal class RssClient
 {
-    internal class RssClient
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<RssClient> _logger;
+
+    public RssClient(HttpClient httpClient, ILogger<RssClient> logger)
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<RssClient> _logger;
+        _httpClient = httpClient;
+        _logger = logger;
+    }
 
-        public RssClient(HttpClient httpClient, ILogger<RssClient> logger)
+    public async Task<IEnumerable<FeedItem>> GetFeed(FeedChannel channel)
+    {
+        try
         {
-            _httpClient = httpClient;
-            _logger = logger;
+            using (var result = await _httpClient.GetAsync(channel.Url))
+            {
+                var xmlRss = await result.Content.ReadAsStringAsync();
+                return xmlRss.IsAtomRss()
+                    ? xmlRss.FeedFromAtomRss()
+                    : xmlRss.FeedFromRss();
+            }
         }
-
-        public async Task<IEnumerable<FeedItem>> GetFeed(FeedChannel channel)
+        catch (Exception e)
         {
-            try
-            {
-                using (var result = await _httpClient.GetAsync(channel.Url))
-                {
-                    var xmlRss = await result.Content.ReadAsStringAsync();
-                    return xmlRss.IsAtomRss()
-                        ? xmlRss.FeedFromAtomRss()
-                        : xmlRss.FeedFromRss();
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(
-                    "Can not get rss feed from \nchannel: {channelName}\nurl: {channelUrl}\n with error: {message} ",
-                    channel.Name, channel.Url, e.Message);
-                return Array.Empty<FeedItem>();
-            }
+            _logger.LogError(
+                "Can not get rss feed from \nchannel: {channelName}\nurl: {channelUrl}\n with error: {message} ",
+                channel.Name, channel.Url, e.Message);
+            return Array.Empty<FeedItem>();
         }
     }
 }

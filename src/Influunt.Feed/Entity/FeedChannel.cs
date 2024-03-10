@@ -1,17 +1,16 @@
 ﻿using Skidbladnir.Repository.Abstractions;
 
-namespace Influunt.Feed.Entity
+namespace Influunt.Feed.Entity;
+
+public class FeedChannel : IHasId<string>
 {
-    public class FeedChannel : IHasId<string>
-    {
-        public string Url { get; set; }
+    public string Url { get; set; }
 
-        public string Name { get; set; }
+    public string Name { get; set; }
 
-        public string UserId { get; set; }
+    public string UserId { get; set; }
 
-        public bool Hidden { get; set; } = false;
+    public bool Hidden { get; set; } = false;
 
-        public string Id { get; set; }
-    }
+    public string Id { get; set; }
 }

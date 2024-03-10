@@ -1,9 +1,6 @@
-﻿using System;
+﻿namespace Influunt.Feed.Entity;
 
-namespace Influunt.Feed.Entity
+public class FavoriteFeedItem : FeedItem
 {
-    public class FavoriteFeedItem : FeedItem
-    {
-        public string ChannelName { get; set; }
-    }
+    public string ChannelName { get; set; }
 }
