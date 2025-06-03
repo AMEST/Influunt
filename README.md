@@ -33,7 +33,7 @@ In order to use the service, you need to log in (so that the user can add his ch
 
 ## Self-hosted Requirements
 * MongoDB - For storing user data (channels, favorites) and for aspnet core secure storage.
-* AspNet Core 3.1 runtime or Docker for service start
+* .NET 8 runtime or Docker for service start
 * Optional reverse proxy for https connection
 
 ## Configurations 
