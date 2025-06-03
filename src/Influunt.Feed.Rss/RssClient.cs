@@ -22,7 +22,9 @@ internal class RssClient
     {
         try
         {
-            using (var result = await _httpClient.GetAsync(channel.Url))
+            var request = new HttpRequestMessage(HttpMethod.Get, channel.Url);
+            request.Headers.Add("user-agent", UserAgents.Generate());
+            using (var result = await _httpClient.SendAsync(request))
             {
                 var xmlRss = await result.Content.ReadAsStringAsync();
                 return xmlRss.IsAtomRss()
