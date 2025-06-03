@@ -7,8 +7,8 @@
     <span style="width: 85%; line-height: 32px">{{ name }}</span>
     <div>
       <b-button variant="outline-warning" class="but" v-on:click="Edit"
-        ><b-icon-pencil icon="pencil" class="mr-2"
-      /></b-button>
+        ><b-icon-pencil icon="pencil" />
+      </b-button>
       <b-button
         variant="outline-warning"
         class="but"
@@ -80,5 +80,9 @@ export default {
 }
 .list-group-item:hover {
   background-color: #333 !important;
+}
+.but svg{
+    position: relative;
+    top: -2px;
 }
 </style>
