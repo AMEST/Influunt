@@ -1,7 +1,6 @@
-﻿namespace Influunt.Storage
+﻿namespace Influunt.Storage;
+
+public class StorageConfiguration
 {
-    public class StorageConfiguration
-    {
-        public string ConnectionString { get; set; }
-    }
+    public string ConnectionString { get; set; }
 }
