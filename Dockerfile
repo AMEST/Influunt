@@ -26,5 +26,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim as influunt
 COPY --from=build /app /influunt
 WORKDIR /influunt
 EXPOSE 80
-ENV ASPNETCORE_HTTP_PORTS=80
+ENV ASPNETCORE_URLS=http://*:80
 ENTRYPOINT ["dotnet", "Influunt.Host.dll"]

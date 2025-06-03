@@ -6,6 +6,7 @@
     <Product>Influunt</Product>
     <Description>Influunt - Simple Rss Agregator</Description>
     <Copyright>Klabukov Erik</Copyright>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Crc32.NET" Version="1.2.0" />
