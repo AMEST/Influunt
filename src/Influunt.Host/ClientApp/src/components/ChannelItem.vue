@@ -58,11 +58,28 @@ export default {
       this.channel.hidden = !this.channel.hidden;
       InfluuntApi.UpdateChannel(this.channel);
     },
-    RemoveChannel: function () {
-      var self = this;
+    RemoveChannel: async function () {
+      var confirmResult = await this.$bvModal.msgBoxConfirm(
+        "Are you sure you want to delete this channel?",
+        {
+          title: "Confirm deletion",
+          size: "sm",
+          buttonSize: "sm",
+          okVariant: "danger",
+          okTitle: "Remove",
+          cancelTitle: "Cancel",
+          hideHeaderClose: false,
+          centered: true,
+          headerClass: "p-2 border-bottom-0",
+          footerClass: "p-2 border-top-0",
+          contentClass: "bg-dark text-light",
+        }
+      );
+      if (!confirmResult) return;
+      
+      const self = this;
+      // eslint-disable-next-line
       InfluuntApi.RemoveChannel(self.id, function (r) {
-        // eslint-disable-next-line
-        var rr = r;
         self.$forceUpdate();
         self.deleted = true;
       });
@@ -81,8 +98,8 @@ export default {
 .list-group-item:hover {
   background-color: #333 !important;
 }
-.but svg{
-    position: relative;
-    top: -2px;
+.but svg {
+  position: relative;
+  top: -2px;
 }
 </style>
