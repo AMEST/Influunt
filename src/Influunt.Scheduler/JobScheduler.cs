@@ -15,40 +15,31 @@ namespace Influunt.Scheduler;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<JobScheduler> _logger;
     private readonly JobSchedulerOptions _options;
-    private readonly MongoUrl _url;
-    private readonly Lazy<IMongoClient> _mongoClient;
-    private IMongoDatabase _database;
+    private readonly IMongoContext _context;
     private readonly string _instanceId; // уникальный идентификатор экземпляра планировщика
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _runningJobs = new();
     private Timer _scanTimer;
     private Timer _heartbeatTimer;
-    private SemaphoreSlim _concurrencySemaphore;
     private bool _disposed;
 
-    public JobScheduler(IServiceProvider serviceProvider, IOptions<JobSchedulerOptions> options, ILogger<JobScheduler> logger)
+    public JobScheduler(IServiceProvider serviceProvider, IOptions<JobSchedulerOptions> options, ILogger<JobScheduler> logger, IMongoContext context)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
         _options = options.Value;
-
-        _url = MongoUrl.Create(_options.ConnectionString);
-        _mongoClient = new Lazy<IMongoClient>(() => new MongoClient(_url));
+        _context = context;
 
         _instanceId = $"{Environment.MachineName}_{Guid.NewGuid():N}";
-        _concurrencySemaphore = new SemaphoreSlim(_options.MaxConcurrentJobs, _options.MaxConcurrentJobs);
     }
 
-    private  IMongoDatabase Database => _database ??= _mongoClient.Value.GetDatabase(_url.DatabaseName);
-    private IMongoCollection<JobDefinition> _jobDefinitions => Database.GetCollection<JobDefinition>("job_definitions");
-    private IMongoCollection<JobTrigger> _triggers => Database.GetCollection<JobTrigger>("job_triggers");
-    private IMongoCollection<JobExecution> _executions => Database.GetCollection<JobExecution>("job_executions");
+    private IMongoCollection<JobDefinition> _jobDefinitions => _context.GetCollection<JobDefinition>(Constants.JobDefinitionsCollectionName);
+    private IMongoCollection<JobTrigger> _triggers => _context.GetCollection<JobTrigger>(Constants.JobTriggersCollectionName);
+    private IMongoCollection<JobExecution> _executions => _context.GetCollection<JobExecution>(Constants.JobExecutionsCollectionName);
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("JobScheduler starting. InstanceId: {InstanceId}", _instanceId);
 
-        // Запускаем создание индексов
-        Task.Factory.StartNew(CreateIndexesAsync, TaskCreationOptions.LongRunning);
         // Запускаем таймеры
         _scanTimer = new Timer(ScanTriggers, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.ScanIntervalSeconds));
         _heartbeatTimer = new Timer(Heartbeat, null, TimeSpan.FromSeconds(_options.HeartbeatIntervalSeconds), TimeSpan.FromSeconds(_options.HeartbeatIntervalSeconds));
@@ -109,6 +100,7 @@ namespace Influunt.Scheduler;
         var trigger = new JobTrigger
         {
             TriggerId = string.IsNullOrEmpty(triggerId) ? Guid.NewGuid().ToString() : triggerId,
+            JobType = registeredJob.JobType,
             NextRunTime = runAt.HasValue ? runAt.Value.ToUniversalTime() : DateTime.UtcNow
         };
         await _triggers.InsertOneAsync(trigger);
@@ -129,6 +121,7 @@ namespace Influunt.Scheduler;
         var trigger = new JobTrigger
         {
             TriggerId = string.IsNullOrEmpty(triggerId) ? Guid.NewGuid().ToString() : triggerId,
+            JobType = registeredJob.JobType,
             NextRunTime = nextRun.Value,
             CronExpression = cronExpression
         };
@@ -148,6 +141,7 @@ namespace Influunt.Scheduler;
         var trigger = new JobTrigger
         {
             TriggerId = string.IsNullOrEmpty(triggerId) ? Guid.NewGuid().ToString() : triggerId,
+            JobType = registeredJob.JobType,
             NextRunTime = runAt.HasValue ? runAt.Value.ToUniversalTime() : DateTime.UtcNow,
             SettingsJson = JsonSerializer.Serialize(settings)
         };
@@ -171,6 +165,7 @@ namespace Influunt.Scheduler;
         var trigger = new JobTrigger
         {
             TriggerId = string.IsNullOrEmpty(triggerId) ? Guid.NewGuid().ToString() : triggerId,
+            JobType = registeredJob.JobType,
             NextRunTime = nextRun.Value,
             CronExpression = cronExpression,
             SettingsJson = JsonSerializer.Serialize(settings)
@@ -208,10 +203,41 @@ namespace Influunt.Scheduler;
                 Builders<JobTrigger>.Filter.Lte(t => t.NextRunTime, now));
             var triggers = await _triggers.Find(filter).ToListAsync();
 
+            // Проверяем текущее количество запущенных заданий
+            var runningCount = _runningJobs.Count;
+            
+            // Если уже достигнут лимит, пропускаем все триггеры
+            if (runningCount >= _options.MaxConcurrentJobs)
+            {
+                _logger.LogDebug("Concurrency limit reached ({Running}/{Max}). Skipping all triggers in this scan cycle.", 
+                    runningCount, _options.MaxConcurrentJobs);
+                return;
+            }
+
+            // Вычисляем сколько заданий еще можно запустить
+            var availableSlots = _options.MaxConcurrentJobs - runningCount;
+            var processedTriggers = 0;
+
             foreach (var trigger in triggers)
             {
-                // Для каждого триггера пытаемся создать выполнение
-                await ScheduleJobAsync(trigger);
+                // Если уже обработали максимально возможное количество триггеров, выходим
+                if (processedTriggers >= availableSlots)
+                {
+                    _logger.LogDebug("Available slots exhausted. Processed {Processed}/{Available} triggers in this cycle.", 
+                        processedTriggers, availableSlots);
+                    break;
+                }
+
+                try
+                {
+                    // Для каждого триггера пытаемся создать выполнение
+                    await ScheduleJobAsync(trigger);
+                    processedTriggers++;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error scheduling job for trigger {TriggerId}", trigger.TriggerId);
+                }
             }
         }
         catch (Exception ex)
@@ -222,7 +248,7 @@ namespace Influunt.Scheduler;
 
     private async Task ScheduleJobAsync(JobTrigger trigger)
     {
-        // Проверяем, не запущено ли уже задание с такой же блокировкой (если запрещён конкурентный запуск)
+        // 1. Получение JobDefinition для определения можно ли запускать конкурентно один и тот же триггер у джобы
         var jobDef = await _jobDefinitions.Find(d => d.JobType == trigger.JobType).FirstOrDefaultAsync();
         if (jobDef == null)
         {
@@ -230,23 +256,58 @@ namespace Influunt.Scheduler;
             return;
         }
 
-        // Если конкурентный запуск запрещён, проверяем наличие выполняющихся экземпляров
-        if (!jobDef.AllowConcurrentExecution)
+        // 2. Проверяем, есть ли блокировка для текущего ТРИГГЕРА
+        var existingExecutionFilter = Builders<JobExecution>.Filter.And(
+            Builders<JobExecution>.Filter.Eq(e => e.TriggerId, trigger.TriggerId),
+            Builders<JobExecution>.Filter.Eq(e => e.Status, ExecutionStatus.Running)
+        );
+        var existingExecution = await _executions.Find(existingExecutionFilter).FirstOrDefaultAsync();
+
+        if (existingExecution == null)
         {
-            var runningFilter = Builders<JobExecution>.Filter.And(
-                Builders<JobExecution>.Filter.Eq(e => e.JobType, trigger.JobType),
-                Builders<JobExecution>.Filter.Eq(e => e.Status, ExecutionStatus.Running));
-            var runningCount = await _executions.CountDocumentsAsync(runningFilter);
-            if (runningCount > 0)
+            // 3. Если JobExecution нет, то создать его, попытаться захватить блокировку, запустить джобу
+            await CreateAndStartJobExecution(trigger, jobDef);
+            return;
+        }
+
+        // Триггер уже запущен, проверяем время
+        var now = DateTime.UtcNow;
+        
+        if (trigger.IsRecurring)
+        {
+            // 2.2 Если задание регулярное, проверяем, если jobExecution относится к текущему периоду запуска
+            // nextRunTime примерно равен startTime у JobExecution (эпсилон время равное 30 секундам)
+            var epsilon = TimeSpan.FromSeconds(30);
+            var timeDiff = Math.Abs((trigger.NextRunTime - existingExecution.StartTime).TotalSeconds);
+            
+            if (timeDiff <= epsilon.TotalSeconds)
             {
-                _logger.LogDebug("Job '{JobName}' with type '{JobType}' is already running and concurrent execution is disabled. Can't run trigger {TriggerId}",
-                jobDef.Name, jobDef.JobType, trigger.TriggerId );
+                _logger.LogDebug("Recurring job '{JobName}' trigger {TriggerId} is already running for current period. Skipping.", 
+                    jobDef.Name, trigger.TriggerId);
                 return;
             }
         }
+        else
+        {
+            // 2.1 Если задания одноразовые, то действие должно быть как при AllowConcurrentExecution=false
+            // не давать запуститься, но только если эта блокировка не устарела
+            // (другая реплика могла умереть и блокировка уже давно просрочена)
+            if (existingExecution.LockExpiry > now)
+            {
+                _logger.LogDebug("One-time job '{JobName}' trigger {TriggerId} is already running and lock is not expired. Skipping.", 
+                    jobDef.Name, trigger.TriggerId);
+                return;
+            }
+        }
+        
+        // Если блокировка устарела (для одноразовых) или для нового периода (для регулярных),
+        // пытаемся захватить блокировку существующего JobExecution
+        await TryCaptureExistingExecutionLock(trigger, jobDef, existingExecution);
+    }
 
-        // TODO: Надо решить проблему зависшего триггера
-        // Создаём запись выполнения с блокировкой (атомарно)
+    private async Task CreateAndStartJobExecution(JobTrigger trigger, JobDefinition jobDef)
+    {
+        // Создаем новую запись выполнения
         var execution = new JobExecution
         {
             TriggerId = trigger.TriggerId,
@@ -254,25 +315,44 @@ namespace Influunt.Scheduler;
             Status = ExecutionStatus.Pending,
             StartTime = DateTime.UtcNow,
             LockId = null,
-            LockExpiry = DateTime.UtcNow,
+            LockExpiry = DateTime.UtcNow.AddSeconds(_options.LockTimeoutSeconds),
             LastHeartbeat = DateTime.UtcNow
         };
 
-        await _executions.InsertOneAsync(execution);
+        try
+        {
+            await _executions.InsertOneAsync(execution);
+        }
+        catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey || ex.WriteError?.Code == 11000)
+        {
+            // Дублирование ключа - другая реплика уже создала JobExecution для этого триггера
+            _logger.LogDebug("Duplicate JobExecution for trigger {TriggerId} detected. Another replica already created it.", trigger.TriggerId);
+            return;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating JobExecution for trigger {TriggerId}", trigger.TriggerId);
+            return;
+        }
 
-        // Пытаемся вставить документ и сразу захватить блокировку
-        // Используем FindOneAndUpdate с условием, что блокировка ещё не получена
+        await TryCaptureExistingExecutionLock(trigger, jobDef, execution, ExecutionStatus.Pending);
+    }
+
+    private async Task TryCaptureExistingExecutionLock(JobTrigger trigger, JobDefinition jobDef, JobExecution existingExecution, ExecutionStatus expectedExecutionStatus = ExecutionStatus.Running )
+    {
         var lockExpiry = DateTime.UtcNow.AddSeconds(_options.LockTimeoutSeconds);
+        
+        // Пытаемся захватить блокировку существующего JobExecution
         var filter = Builders<JobExecution>.Filter.And(
-            Builders<JobExecution>.Filter.Eq(e => e.Id, execution.Id), // только что созданный Id
-            Builders<JobExecution>.Filter.Eq(e => e.Status, ExecutionStatus.Pending),
+            Builders<JobExecution>.Filter.Eq(e => e.Id, existingExecution.Id),
+            Builders<JobExecution>.Filter.Eq(e => e.Status, expectedExecutionStatus),
             Builders<JobExecution>.Filter.Or(
                 Builders<JobExecution>.Filter.Eq(e => e.LockId, null),
                 Builders<JobExecution>.Filter.Lt(e => e.LockExpiry, DateTime.UtcNow)
             )
         );
+        
         var update = Builders<JobExecution>.Update
-            .Set(e => e.Status, ExecutionStatus.Running)
             .Set(e => e.LockId, _instanceId)
             .Set(e => e.LockExpiry, lockExpiry)
             .Set(e => e.LastHeartbeat, DateTime.UtcNow);
@@ -280,19 +360,20 @@ namespace Influunt.Scheduler;
         var updated = await _executions.FindOneAndUpdateAsync(filter, update);
         if (updated == null)
         {
-            // Не удалось захватить блокировку — удаляем запись или оставляем как есть (другая реплика уже взяла)
-            await _executions.DeleteOneAsync(e => e.Id == execution.Id);
-            _logger.LogDebug("Failed to acquire lock for trigger {TriggerId}", trigger.TriggerId);
+            // Если блокировку не удалось захватить, то пропустить триггер
+            _logger.LogDebug("Failed to acquire lock for existing execution of trigger {TriggerId}", trigger.TriggerId);
             return;
         }
 
-        // Блокировка получена — запускаем выполнение
-        _logger.LogInformation("Starting job {JobName}. TriggerId: {TriggerId}. ExecutionId: {ExecutionId}", jobDef.Name, trigger.TriggerId, execution.Id);
+        // Если блокировка удалась, то запустить джобу
+        _logger.LogInformation("Starting job '{JobName}' with existing execution. TriggerId: {TriggerId}. ExecutionId: {ExecutionId}", 
+            jobDef.Name, trigger.TriggerId, existingExecution.Id);
+        
         var cts = new CancellationTokenSource();
-        _runningJobs.TryAdd(execution.Id, cts);
+        _runningJobs.TryAdd(existingExecution.Id, cts);
 
         // Запускаем асинхронное выполнение
-        _ = Task.Run(() => ExecuteJobAsync(trigger, execution, jobDef, cts.Token));
+        _ = Task.Run(() => ExecuteJobAsync(trigger, existingExecution, jobDef, cts.Token));
     }
 
     private async Task ExecuteJobAsync(JobTrigger trigger, JobExecution execution, JobDefinition jobDef, CancellationToken cancellationToken)
@@ -350,7 +431,6 @@ namespace Influunt.Scheduler;
         finally
         {
             _runningJobs.TryRemove(execution.Id, out _);
-            _concurrencySemaphore.Release();
         }
     }
 
@@ -414,42 +494,11 @@ namespace Influunt.Scheduler;
         }
     }
 
-    private async Task CreateIndexesAsync()
-    {
-        // Индекс по имени задания
-        await _jobDefinitions.Indexes.CreateOneAsync(
-            new CreateIndexModel<JobDefinition>(Builders<JobDefinition>.IndexKeys.Ascending(x => x.Name),
-            new CreateIndexOptions { Unique = true, Background = true }));
-        // Индекс по типу задания
-        await _jobDefinitions.Indexes.CreateOneAsync(
-            new CreateIndexModel<JobDefinition>(Builders<JobDefinition>.IndexKeys.Ascending(x => x.JobType),
-            new CreateIndexOptions { Unique = true, Background = true }));
-
-        // Индекс для поиска триггеров по следующему времени запуска
-        await _triggers.Indexes.CreateOneAsync(
-            new CreateIndexModel<JobTrigger>(Builders<JobTrigger>.IndexKeys.Ascending(x => x.NextRunTime),
-            new CreateIndexOptions { Background = true }));
-
-        // Индекс поиска триггера по JobName
-        await _triggers.Indexes.CreateOneAsync(
-            new CreateIndexModel<JobTrigger>(Builders<JobTrigger>.IndexKeys.Ascending(x => x.TriggerId), 
-            new CreateIndexOptions { Unique = true, Background = true }));
-
-        // Индекс для поиска выполняющихся заданий по блокировке
-        await _executions.Indexes.CreateOneAsync(
-            new CreateIndexModel<JobExecution>(Builders<JobExecution>.IndexKeys.Ascending(x => x.LockId).Ascending(x => x.Status),
-            new CreateIndexOptions { Background = true }));
-        await _executions.Indexes.CreateOneAsync(
-            new CreateIndexModel<JobExecution>(Builders<JobExecution>.IndexKeys.Ascending(x => x.JobType).Ascending(x => x.Status),
-            new CreateIndexOptions { Background = true }));
-    }
-
     public void Dispose()
     {
         if (_disposed) return;
         _scanTimer?.Dispose();
         _heartbeatTimer?.Dispose();
-        _concurrencySemaphore?.Dispose();
         _disposed = true;
     }
 }
