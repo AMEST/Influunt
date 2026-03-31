@@ -2,18 +2,18 @@ namespace Influunt.Scheduler;
 
     public class JobSchedulerOptions
     {
-        /// <summary>Строка подключения к MongoDB.</summary>
+        /// <summary>MongoDB connection string.</summary>
         public string ConnectionString { get; set; } = "mongodb://localhost:27017/JobScheduler";
 
-        /// <summary>Интервал сканирования триггеров (сек).</summary>
+        /// <summary>Trigger scan interval (seconds).</summary>
         public int ScanIntervalSeconds { get; set; } = 60;
 
-        /// <summary>Время жизни блокировки (сек).</summary>
+        /// <summary>Lock timeout duration (seconds).</summary>
         public int LockTimeoutSeconds { get; set; } = 300;
 
-        /// <summary>Интервал обновления heartbeat (сек).</summary>
+        /// <summary>Heartbeat update interval (seconds).</summary>
         public int HeartbeatIntervalSeconds { get; set; } = 60;
 
-        /// <summary>Максимальное количество одновременно выполняемых заданий.</summary>
+        /// <summary>Maximum number of concurrently running jobs.</summary>
         public int MaxConcurrentJobs { get; set; } = 10;
     }

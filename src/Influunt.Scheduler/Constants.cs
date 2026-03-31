@@ -1,22 +1,22 @@
 namespace Influunt.Scheduler;
 
 /// <summary>
-/// Константы для модуля планировщика заданий.
+/// Constants for the job scheduler module.
 /// </summary>
 public static class Constants
 {
     /// <summary>
-    /// Имя коллекции определений заданий.
+    /// Job definitions collection name.
     /// </summary>
     public const string JobDefinitionsCollectionName = "job_definitions";
 
     /// <summary>
-    /// Имя коллекции триггеров заданий.
+    /// Job triggers collection name.
     /// </summary>
     public const string JobTriggersCollectionName = "job_triggers";
 
     /// <summary>
-    /// Имя коллекции выполнений заданий.
+    /// Job executions collection name.
     /// </summary>
     public const string JobExecutionsCollectionName = "job_executions";
 }

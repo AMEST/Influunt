@@ -16,7 +16,7 @@ namespace Influunt.Scheduler;
     private readonly ILogger<JobScheduler> _logger;
     private readonly JobSchedulerOptions _options;
     private readonly IMongoContext _context;
-    private readonly string _instanceId; // уникальный идентификатор экземпляра планировщика
+    private readonly string _instanceId; // unique scheduler instance identifier
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _runningJobs = new();
     private Timer _scanTimer;
     private Timer _heartbeatTimer;
@@ -40,7 +40,7 @@ namespace Influunt.Scheduler;
     {
         _logger.LogInformation("JobScheduler starting. InstanceId: {InstanceId}", _instanceId);
 
-        // Запускаем таймеры
+        // Start timers
         _scanTimer = new Timer(ScanTriggers, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.ScanIntervalSeconds));
         _heartbeatTimer = new Timer(Heartbeat, null, TimeSpan.FromSeconds(_options.HeartbeatIntervalSeconds), TimeSpan.FromSeconds(_options.HeartbeatIntervalSeconds));
 
@@ -54,12 +54,12 @@ namespace Influunt.Scheduler;
         _scanTimer?.Change(Timeout.Infinite, 0);
         _heartbeatTimer?.Change(Timeout.Infinite, 0);
 
-        // Отменяем все запущенные задания
+        // Cancel all running jobs
         foreach (var cts in _runningJobs.Values)
             cts.Cancel();
 
-        // Ждём завершения всех заданий (упрощённо)
-        // В реальном проекте нужно более тщательно ожидать завершения
+        // Wait for all jobs to complete (simplified)
+        // In a real project, more careful waiting for completion is needed
         return Task.CompletedTask;
     }
 
@@ -191,22 +191,22 @@ namespace Influunt.Scheduler;
         return await cursor.ToListAsync();
     }
 
-    // ============================== Сканирование триггеров ==============================
+    // ============================== Trigger Scanning ==============================
 
     private async void ScanTriggers(object? state)
     {
         try
         {
             var now = DateTime.UtcNow;
-            // Находим триггеры, у которых NextRunTime <= now и которые активны
+            // Find triggers where NextRunTime <= now and are active
             var filter = Builders<JobTrigger>.Filter.And(
                 Builders<JobTrigger>.Filter.Lte(t => t.NextRunTime, now));
             var triggers = await _triggers.Find(filter).ToListAsync();
 
-            // Проверяем текущее количество запущенных заданий
+            // Check current number of running jobs
             var runningCount = _runningJobs.Count;
             
-            // Если уже достигнут лимит, пропускаем все триггеры
+            // If limit is already reached, skip all triggers
             if (runningCount >= _options.MaxConcurrentJobs)
             {
                 _logger.LogDebug("Concurrency limit reached ({Running}/{Max}). Skipping all triggers in this scan cycle.", 
@@ -214,13 +214,13 @@ namespace Influunt.Scheduler;
                 return;
             }
 
-            // Вычисляем сколько заданий еще можно запустить
+            // Calculate how many more jobs can be started
             var availableSlots = _options.MaxConcurrentJobs - runningCount;
             var processedTriggers = 0;
 
             foreach (var trigger in triggers)
             {
-                // Если уже обработали максимально возможное количество триггеров, выходим
+                // If maximum possible number of triggers have been processed, exit
                 if (processedTriggers >= availableSlots)
                 {
                     _logger.LogDebug("Available slots exhausted. Processed {Processed}/{Available} triggers in this cycle.", 
@@ -230,7 +230,7 @@ namespace Influunt.Scheduler;
 
                 try
                 {
-                    // Для каждого триггера пытаемся создать выполнение
+                    // For each trigger, attempt to create execution
                     await ScheduleJobAsync(trigger);
                     processedTriggers++;
                 }
@@ -248,7 +248,7 @@ namespace Influunt.Scheduler;
 
     private async Task ScheduleJobAsync(JobTrigger trigger)
     {
-        // 1. Получение JobDefinition для определения можно ли запускать конкурентно один и тот же триггер у джобы
+        // 1. Get JobDefinition to determine if the same trigger can be executed concurrently for a job
         var jobDef = await _jobDefinitions.Find(d => d.JobType == trigger.JobType).FirstOrDefaultAsync();
         if (jobDef == null)
         {
@@ -256,7 +256,7 @@ namespace Influunt.Scheduler;
             return;
         }
 
-        // 2. Проверяем, есть ли блокировка для текущего ТРИГГЕРА
+        // 2. Check if there is a lock for the current TRIGGER
         var existingExecutionFilter = Builders<JobExecution>.Filter.And(
             Builders<JobExecution>.Filter.Eq(e => e.TriggerId, trigger.TriggerId),
             Builders<JobExecution>.Filter.Eq(e => e.Status, ExecutionStatus.Running)
@@ -265,18 +265,18 @@ namespace Influunt.Scheduler;
 
         if (existingExecution == null)
         {
-            // 3. Если JobExecution нет, то создать его, попытаться захватить блокировку, запустить джобу
+            // 3. If JobExecution doesn't exist, create it, attempt to acquire lock, start the job
             await CreateAndStartJobExecution(trigger, jobDef);
             return;
         }
 
-        // Триггер уже запущен, проверяем время
+        // Trigger is already running, check the time
         var now = DateTime.UtcNow;
         
         if (trigger.IsRecurring)
         {
-            // 2.2 Если задание регулярное, проверяем, если jobExecution относится к текущему периоду запуска
-            // nextRunTime примерно равен startTime у JobExecution (эпсилон время равное 30 секундам)
+            // 2.2 If job is recurring, check if jobExecution belongs to the current run period
+            // nextRunTime is approximately equal to JobExecution startTime (epsilon time of 30 seconds)
             var epsilon = TimeSpan.FromSeconds(30);
             var timeDiff = Math.Abs((trigger.NextRunTime - existingExecution.StartTime).TotalSeconds);
             
@@ -289,9 +289,9 @@ namespace Influunt.Scheduler;
         }
         else
         {
-            // 2.1 Если задания одноразовые, то действие должно быть как при AllowConcurrentExecution=false
-            // не давать запуститься, но только если эта блокировка не устарела
-            // (другая реплика могла умереть и блокировка уже давно просрочена)
+            // 2.1 If jobs are one-time, behavior should be like with AllowConcurrentExecution=false
+            // Don't allow to start, but only if this lock is not expired
+            // (another replica could have died and the lock is long expired)
             if (existingExecution.LockExpiry > now)
             {
                 _logger.LogDebug("One-time job '{JobName}' trigger {TriggerId} is already running and lock is not expired. Skipping.", 
@@ -300,14 +300,14 @@ namespace Influunt.Scheduler;
             }
         }
         
-        // Если блокировка устарела (для одноразовых) или для нового периода (для регулярных),
-        // пытаемся захватить блокировку существующего JobExecution
+        // If lock is expired (for one-time) or for new period (for recurring),
+        // attempt to capture lock of existing JobExecution
         await TryCaptureExistingExecutionLock(trigger, jobDef, existingExecution);
     }
 
     private async Task CreateAndStartJobExecution(JobTrigger trigger, JobDefinition jobDef)
     {
-        // Создаем новую запись выполнения
+        // Create new execution record
         var execution = new JobExecution
         {
             TriggerId = trigger.TriggerId,
@@ -325,7 +325,7 @@ namespace Influunt.Scheduler;
         }
         catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey || ex.WriteError?.Code == 11000)
         {
-            // Дублирование ключа - другая реплика уже создала JobExecution для этого триггера
+            // Duplicate key - another replica already created JobExecution for this trigger
             _logger.LogDebug("Duplicate JobExecution for trigger {TriggerId} detected. Another replica already created it.", trigger.TriggerId);
             return;
         }
@@ -342,7 +342,7 @@ namespace Influunt.Scheduler;
     {
         var lockExpiry = DateTime.UtcNow.AddSeconds(_options.LockTimeoutSeconds);
         
-        // Пытаемся захватить блокировку существующего JobExecution
+        // Attempt to capture lock of existing JobExecution
         var filter = Builders<JobExecution>.Filter.And(
             Builders<JobExecution>.Filter.Eq(e => e.Id, existingExecution.Id),
             Builders<JobExecution>.Filter.Eq(e => e.Status, expectedExecutionStatus),
@@ -360,19 +360,19 @@ namespace Influunt.Scheduler;
         var updated = await _executions.FindOneAndUpdateAsync(filter, update);
         if (updated == null)
         {
-            // Если блокировку не удалось захватить, то пропустить триггер
+            // If failed to acquire lock, skip the trigger
             _logger.LogDebug("Failed to acquire lock for existing execution of trigger {TriggerId}", trigger.TriggerId);
             return;
         }
 
-        // Если блокировка удалась, то запустить джобу
+        // If lock acquisition succeeded, start the job
         _logger.LogInformation("Starting job '{JobName}' with existing execution. TriggerId: {TriggerId}. ExecutionId: {ExecutionId}", 
             jobDef.Name, trigger.TriggerId, existingExecution.Id);
         
         var cts = new CancellationTokenSource();
         _runningJobs.TryAdd(existingExecution.Id, cts);
 
-        // Запускаем асинхронное выполнение
+        // Start asynchronous execution
         _ = Task.Run(() => ExecuteJobAsync(trigger, existingExecution, jobDef, cts.Token));
     }
 
@@ -380,14 +380,14 @@ namespace Influunt.Scheduler;
     {
         try
         {
-            // Получаем экземпляр задания из DI (transient или scoped)
+            // Get job instance from DI (transient or scoped)
             using var scope = _serviceProvider.CreateScope();
             var jobType = Type.GetType(jobDef.JobType) ?? throw new InvalidOperationException($"Cannot load job type {jobDef.JobType}");
 
-            // Проверяем, есть ли настройки
+            // Check if there are settings
             if (string.IsNullOrEmpty(jobDef.SettingsType))
             {
-                // Задание без настроек
+                // Job without settings
                 var job = scope.ServiceProvider.GetRequiredService(jobType) as IJob;
                 if (job == null)
                     throw new InvalidOperationException($"Job {jobDef.JobType} does not implement IJob");
@@ -395,7 +395,7 @@ namespace Influunt.Scheduler;
             }
             else
             {
-                // Задание с настройками
+                // Job with settings
                 var settingsType = Type.GetType(jobDef.SettingsType);
                 if (settingsType == null)
                     throw new InvalidOperationException($"Cannot load settings type {jobDef.SettingsType}");
@@ -412,9 +412,9 @@ namespace Influunt.Scheduler;
                 await (Task)method.Invoke(job, [settings, cancellationToken]);
             }
 
-            // Успешное завершение
+            // Successful completion
             await UpdateExecutionStatus(execution.Id, ExecutionStatus.Completed, result: "Success");
-            // Обновляем время следующего запуска триггера
+            // Update next run time for trigger
             await UpdateTriggerNextRun(trigger);
             _logger.LogInformation("Job {JobName} (ExecutionId: {ExecutionId}) completed successfully", jobDef.Name, execution.Id);
         }
@@ -440,7 +440,7 @@ namespace Influunt.Scheduler;
             .Set(e => e.Status, status)
             .Set(e => e.EndTime, DateTime.UtcNow)
             .Set(e => e.Result, result)
-            .Unset(e => e.LockId) // снимаем блокировку
+            .Unset(e => e.LockId) // remove lock
             .Unset(e => e.LockExpiry);
         await _executions.UpdateOneAsync(e => e.Id == executionId, update);
     }
@@ -449,16 +449,16 @@ namespace Influunt.Scheduler;
     {
         if (!trigger.IsRecurring || string.IsNullOrEmpty(trigger.CronExpression))
         {
-            // Одноразовый триггер — удаляем
+            // One-time trigger — delete it
             await _triggers.DeleteOneAsync(t => t.Id == trigger.Id);
             return;
         }
 
-        // Вычисляем следующее время запуска на основе Cron
+        // Calculate next run time based on Cron
         var nextRun = CronHelper.GetNextOccurrence(trigger.CronExpression, DateTime.UtcNow);
         if (!nextRun.HasValue)
         {
-            // Cron больше не сработает (например, истёк) — удаляем
+            // Cron will no longer fire (e.g., expired) — delete it
             await _triggers.DeleteOneAsync(t => t.Id == trigger.Id);
             return;
         }
@@ -476,7 +476,7 @@ namespace Influunt.Scheduler;
             var now = DateTime.UtcNow;
             var newExpiry = now.AddSeconds(_options.LockTimeoutSeconds);
 
-            // Находим все выполнения, которые принадлежат этому экземпляру и находятся в статусе Running
+            // Find all executions that belong to this instance and are in Running status
             var filter = Builders<JobExecution>.Filter.And(
                 Builders<JobExecution>.Filter.Eq(e => e.LockId, _instanceId),
                 Builders<JobExecution>.Filter.Eq(e => e.Status, ExecutionStatus.Running));

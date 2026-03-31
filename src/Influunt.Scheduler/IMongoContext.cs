@@ -3,25 +3,25 @@ using MongoDB.Driver;
 namespace Influunt.Scheduler;
 
 /// <summary>
-/// Интерфейс для работы с MongoDB контекстом
+/// Interface for working with MongoDB context
 /// </summary>
 public interface IMongoContext
 {
     /// <summary>
-    /// Получает базу данных MongoDB
+    /// Gets the MongoDB database
     /// </summary>
     IMongoDatabase Database { get; }
     
     /// <summary>
-    /// Получает коллекцию указанного типа
+    /// Gets the collection of the specified type
     /// </summary>
-    /// <typeparam name="T">Тип документов коллекции</typeparam>
-    /// <param name="collectionName">Имя коллекции (если null, будет использовано имя типа)</param>
-    /// <returns>Коллекция MongoDB</returns>
+    /// <typeparam name="T">Type of collection documents</typeparam>
+    /// <param name="collectionName">Collection name (if null, the type name will be used)</param>
+    /// <returns>MongoDB collection</returns>
     IMongoCollection<T> GetCollection<T>(string collectionName = null);
     
     /// <summary>
-    /// Освобождает ресурсы
+    /// Releases resources
     /// </summary>
     void Dispose();
 }

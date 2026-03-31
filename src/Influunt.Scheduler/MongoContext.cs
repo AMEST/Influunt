@@ -5,7 +5,7 @@ using MongoDB.Driver;
 namespace Influunt.Scheduler;
 
 /// <summary>
-/// Реализация контекста MongoDB
+/// MongoDB context implementation
 /// </summary>
 public class MongoContext : IMongoContext, IDisposable
 {
@@ -15,9 +15,9 @@ public class MongoContext : IMongoContext, IDisposable
     private bool _disposed;
 
     /// <summary>
-    /// Создает новый экземпляр MongoContext с указанной строкой подключения
+    /// Creates a new instance of MongoContext with the specified connection string
     /// </summary>
-    /// <param name="options">Настройки планировщика заданий</param>
+    /// <param name="options">Job scheduler options</param>
     public MongoContext(IOptions<JobSchedulerOptions> options)
     {
         if (options?.Value?.ConnectionString == null)
@@ -25,24 +25,24 @@ public class MongoContext : IMongoContext, IDisposable
 
         var connectionString = options.Value.ConnectionString;
         
-        // Парсинг строки подключения
+        // Connection string parsing
         _url = MongoUrl.Create(connectionString);
         
-        // Lazy создание MongoClient
+        // Lazy creation of MongoClient
         _mongoClient = new Lazy<IMongoClient>(() => new MongoClient(_url));
     }
 
     /// <summary>
-    /// Получает базу данных MongoDB
+    /// Gets the MongoDB database
     /// </summary>
     public IMongoDatabase Database => _database ??= _mongoClient.Value.GetDatabase(_url.DatabaseName);
 
     /// <summary>
-    /// Получает коллекцию указанного типа
+    /// Gets the collection of the specified type
     /// </summary>
-    /// <typeparam name="T">Тип документов коллекции</typeparam>
-    /// <param name="collectionName">Имя коллекции (если null, будет использовано имя типа)</param>
-    /// <returns>Коллекция MongoDB</returns>
+    /// <typeparam name="T">Type of collection documents</typeparam>
+    /// <param name="collectionName">Collection name (if null, the type name will be used)</param>
+    /// <returns>MongoDB collection</returns>
     public IMongoCollection<T> GetCollection<T>(string? collectionName = null)
     {
         if (_disposed)
@@ -53,7 +53,7 @@ public class MongoContext : IMongoContext, IDisposable
     }
 
     /// <summary>
-    /// Освобождает ресурсы
+    /// Releases resources
     /// </summary>
     public void Dispose()
     {
@@ -62,7 +62,7 @@ public class MongoContext : IMongoContext, IDisposable
     }
 
     /// <summary>
-    /// Освобождает ресурсы
+    /// Releases resources
     /// </summary>
     protected virtual void Dispose(bool disposing)
     {
@@ -70,10 +70,10 @@ public class MongoContext : IMongoContext, IDisposable
         {
             if (disposing)
             {
-                // Очищаем управляемые ресурсы
+                // Cleaning up managed resources
                 if (_mongoClient.IsValueCreated)
                 {
-                    // MongoClient не требует явного Dispose, но если нужно, можно добавить
+                    // MongoClient does not require explicit Dispose, but it can be added if needed
                 }
             }
 
@@ -82,7 +82,7 @@ public class MongoContext : IMongoContext, IDisposable
     }
 
     /// <summary>
-    /// Финализатор
+    /// Finalizer
     /// </summary>
     ~MongoContext()
     {

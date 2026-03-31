@@ -10,8 +10,8 @@ using MongoDB.Driver;
 namespace Influunt.Scheduler;
 
 /// <summary>
-/// Background service для создания индексов MongoDB для модуля планировщика.
-/// Выполняется однократно при запуске приложения.
+/// Background service for creating MongoDB indexes for the scheduler module.
+/// Runs once when the application starts.
 /// </summary>
 public class IndexCreationBackgroundService : BackgroundService
 {
@@ -28,7 +28,7 @@ public class IndexCreationBackgroundService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("Index Creation Background Service запущен.");
+        _logger.LogInformation("Index Creation Background Service started.");
 
         try
         {
@@ -36,23 +36,23 @@ public class IndexCreationBackgroundService : BackgroundService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Ошибка при создании индексов MongoDB");
+            _logger.LogError(ex, "Error creating MongoDB indexes");
             throw;
         }
         finally
         {
-            _logger.LogInformation("Index Creation Background Service завершил работу.");
+            _logger.LogInformation("Index Creation Background Service finished.");
         }
     }
 
     /// <summary>
-    /// Создает индексы для коллекций планировщика.
+    /// Creates indexes for scheduler collections.
     /// </summary>
     private async Task CreateIndexesAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Начинаем создание индексов MongoDB для модуля планировщика...");
+        _logger.LogInformation("Starting MongoDB index creation for scheduler module...");
 
-        // Используем скоуп для получения зависимостей с правильным временем жизни
+        // Using scope to get dependencies with correct lifetime
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<IMongoContext>();
 
@@ -60,102 +60,102 @@ public class IndexCreationBackgroundService : BackgroundService
         await CreateJobTriggerIndexesAsync(context, cancellationToken);
         await CreateJobExecutionIndexesAsync(context, cancellationToken);
 
-        _logger.LogInformation("Создание индексов MongoDB для модуля планировщика завершено.");
+        _logger.LogInformation("MongoDB index creation for scheduler module completed.");
     }
 
     private async Task CreateJobDefinitionIndexesAsync(IMongoContext context, CancellationToken cancellationToken)
     {
         var collection = context.GetCollection<JobDefinition>(Constants.JobDefinitionsCollectionName);
         
-        // Уникальный индекс по имени задания
+        // Unique index by job name
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobDefinition>(
                 Builders<JobDefinition>.IndexKeys.Ascending(x => x.Name),
                 new CreateIndexOptions { Unique = true, Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан уникальный индекс JobDefinition.Name");
+        _logger.LogDebug("Created unique index JobDefinition.Name");
 
-        // Уникальный индекс по типу задания
+        // Unique index by job type
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobDefinition>(
                 Builders<JobDefinition>.IndexKeys.Ascending(x => x.JobType),
                 new CreateIndexOptions { Unique = true, Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан уникальный индекс JobDefinition.JobType");
+        _logger.LogDebug("Created unique index JobDefinition.JobType");
     }
 
     private async Task CreateJobTriggerIndexesAsync(IMongoContext context, CancellationToken cancellationToken)
     {
         var collection = context.GetCollection<JobTrigger>(Constants.JobTriggersCollectionName);
         
-        // Индекс для поиска триггеров по следующему времени запуска
+        // Index for searching triggers by next run time
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobTrigger>(
                 Builders<JobTrigger>.IndexKeys.Ascending(x => x.NextRunTime),
                 new CreateIndexOptions { Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан индекс JobTrigger.NextRunTime");
+        _logger.LogDebug("Created index JobTrigger.NextRunTime");
 
-        // Уникальный индекс по идентификатору триггера
+        // Unique index by trigger identifier
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobTrigger>(
                 Builders<JobTrigger>.IndexKeys.Ascending(x => x.TriggerId),
                 new CreateIndexOptions { Unique = true, Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан уникальный индекс JobTrigger.TriggerId");
+        _logger.LogDebug("Created unique index JobTrigger.TriggerId");
     }
 
     private async Task CreateJobExecutionIndexesAsync(IMongoContext context, CancellationToken cancellationToken)
     {
         var collection = context.GetCollection<JobExecution>(Constants.JobExecutionsCollectionName);
         
-        // Уникальный индекс по идентификатору триггера (чтобы только одно выполнение на триггер)
+        // Unique index by trigger identifier (to ensure only one execution per trigger)
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobExecution>(
                 Builders<JobExecution>.IndexKeys.Ascending(x => x.TriggerId),
                 new CreateIndexOptions { Unique = true, Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан уникальный индекс JobExecution.TriggerId");
+        _logger.LogDebug("Created unique index JobExecution.TriggerId");
 
-        // Индекс для поиска выполняющихся заданий по блокировке
+        // Index for searching running jobs by lock
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobExecution>(
                 Builders<JobExecution>.IndexKeys.Ascending(x => x.LockId).Ascending(x => x.Status),
                 new CreateIndexOptions { Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан составной индекс JobExecution.LockId+Status");
+        _logger.LogDebug("Created compound index JobExecution.LockId+Status");
 
-        // Индекс по типу задания и статусу
+        // Index by job type and status
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobExecution>(
                 Builders<JobExecution>.IndexKeys.Ascending(x => x.JobType).Ascending(x => x.Status),
                 new CreateIndexOptions { Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан составной индекс JobExecution.JobType+Status");
+        _logger.LogDebug("Created compound index JobExecution.JobType+Status");
 
-        // Индекс для поиска выполнений по триггеру и статусу (используется в ScheduleJobAsync)
+        // Index for searching executions by trigger and status (used in ScheduleJobAsync)
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobExecution>(
                 Builders<JobExecution>.IndexKeys.Ascending(x => x.TriggerId).Ascending(x => x.Status),
                 new CreateIndexOptions { Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан составной индекс JobExecution.TriggerId+Status");
+        _logger.LogDebug("Created compound index JobExecution.TriggerId+Status");
 
-        // Индекс для поиска устаревших блокировок (используется в CreateAndStartJobExecution и TryCaptureExistingExecutionLock)
+        // Index for searching expired locks (used in CreateAndStartJobExecution and TryCaptureExistingExecutionLock)
         await collection.Indexes.CreateOneAsync(
             new CreateIndexModel<JobExecution>(
                 Builders<JobExecution>.IndexKeys.Ascending(x => x.LockExpiry),
                 new CreateIndexOptions { Background = true }),
             cancellationToken: cancellationToken);
         
-        _logger.LogDebug("Создан индекс JobExecution.LockExpiry");
+        _logger.LogDebug("Created index JobExecution.LockExpiry");
     }
 }
