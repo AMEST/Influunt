@@ -16,13 +16,19 @@ public static class SchedulerModule
         
         // Register JobScheduler
         services.AddSingleton<IScheduler, JobScheduler>();
-        
+    
         services.AddHostedService<IndexCreationBackgroundService>();
         
         // Register BSON class maps
-        BsonClassMap.RegisterClassMap(new JobDefinitionClassMap());
-        BsonClassMap.RegisterClassMap(new JobExecutionClassMap());
-        BsonClassMap.RegisterClassMap(new JobTriggerClassMap());
+        try{
+            BsonClassMap.RegisterClassMap(new JobDefinitionClassMap());
+            BsonClassMap.RegisterClassMap(new JobExecutionClassMap());
+            BsonClassMap.RegisterClassMap(new JobTriggerClassMap());
+        }
+        catch (ArgumentException)
+        {
+            // Do nothing. Needs for tests
+        }
         
         return services;
     }

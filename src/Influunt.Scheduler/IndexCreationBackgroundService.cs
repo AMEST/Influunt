@@ -1,6 +1,3 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Influunt.Scheduler.Abstractions.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -56,8 +53,8 @@ public class IndexCreationBackgroundService : BackgroundService
         using var scope = _serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<IMongoContext>();
 
-        await CreateJobDefinitionIndexesAsync(context, cancellationToken);
         await CreateJobTriggerIndexesAsync(context, cancellationToken);
+        await CreateJobDefinitionIndexesAsync(context, cancellationToken);
         await CreateJobExecutionIndexesAsync(context, cancellationToken);
 
         _logger.LogInformation("MongoDB index creation for scheduler module completed.");
