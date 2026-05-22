@@ -1,4 +1,6 @@
 using AwesomeAssertions;
+using Influunt.Scheduler;
+using Influunt.Scheduler.Abstractions.Models;
 using Influunt.Scheduler.Abstractions.Services;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -28,7 +30,9 @@ public class JobSchedulerIntegrationTests : SchedulerIntegrationTestBase
     {
         // Reset static fields
         TestJobWithoutSettings.WasExecuted = false;
+        TestJobWithoutSettings.ExecutionCount = 0;
         TestJobWithSettings.WasExecuted = false;
+        TestJobWithSettings.ExecutionCount = 0;
         TestJobWithSettings.LastSettings = null;
         
         await base.InitializeTestDataAsync();
@@ -137,6 +141,39 @@ public class JobSchedulerIntegrationTests : SchedulerIntegrationTestBase
     }
 
     [Fact]
+    public async Task Should_Execute_Recurring_Job_Multiple_Times()
+    {
+        // Arrange
+        var scheduler = GetRequiredService<IScheduler>();
+        await scheduler.RegisterJobAsync<TestJobWithoutSettings>("TestJobWithoutSettings");
+
+        var triggerId = await scheduler.ScheduleRecurringJobAsync<TestJobWithoutSettings>("* * * * *");
+
+        // Force the trigger to be due immediately
+        var context = GetRequiredService<IMongoContext>();
+        var triggersCollection = context.GetCollection<JobTrigger>(Constants.JobTriggersCollectionName);
+        await ForceRunTrigger(triggerId, triggersCollection);
+
+        // Wait for first execution to complete
+        await Task.Delay(TimeSpan.FromSeconds(3));
+
+        TestJobWithoutSettings.ExecutionCount.Should().BeGreaterThanOrEqualTo(1);
+
+        // Force trigger to be due again for second execution
+        await ForceRunTrigger(triggerId, triggersCollection);
+
+        // Wait for second scan cycle
+        await Task.Delay(TimeSpan.FromSeconds(3));
+
+        // Verify job ran at least twice
+        TestJobWithoutSettings.ExecutionCount.Should().BeGreaterThanOrEqualTo(2);
+
+        // Trigger should still exist for recurring job
+        var remainingTriggers = await scheduler.GetScheduledTriggersAsync();
+        remainingTriggers.Should().ContainSingle();
+    }
+
+    [Fact]
     public async Task Should_Schedule_OneTime_Job_With_Settings()
     {
         // Arrange
@@ -226,5 +263,13 @@ public class JobSchedulerIntegrationTests : SchedulerIntegrationTestBase
         // All triggers should be removed after execution
         triggers = await scheduler.GetScheduledTriggersAsync();
         triggers.Should().BeEmpty();
+    }
+
+    
+    private static async Task ForceRunTrigger(string triggerId, IMongoCollection<JobTrigger> triggersCollection)
+    {
+        await triggersCollection.UpdateOneAsync(
+                    t => t.TriggerId == triggerId,
+                    Builders<JobTrigger>.Update.Set(t => t.NextRunTime, DateTime.UtcNow.AddSeconds(-5)));
     }
 }

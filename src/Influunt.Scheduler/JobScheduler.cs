@@ -265,7 +265,19 @@ namespace Influunt.Scheduler;
 
         if (existingExecution == null)
         {
-            // 3. If JobExecution doesn't exist, create it, attempt to acquire lock, start the job
+            // 3. Clean up any previous terminal executions for this trigger
+            // (Completed or Failed from a previous recurring run)
+            await _executions.DeleteManyAsync(
+                Builders<JobExecution>.Filter.And(
+                    Builders<JobExecution>.Filter.Eq(e => e.TriggerId, trigger.TriggerId),
+                    Builders<JobExecution>.Filter.Or(
+                        Builders<JobExecution>.Filter.Eq(e => e.Status, ExecutionStatus.Completed),
+                        Builders<JobExecution>.Filter.Eq(e => e.Status, ExecutionStatus.Failed)
+                    )
+                )
+            );
+
+            // 4. If JobExecution doesn't exist, create it, attempt to acquire lock, start the job
             await CreateAndStartJobExecution(trigger, jobDef);
             return;
         }
