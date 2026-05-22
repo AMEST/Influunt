@@ -3,7 +3,7 @@ namespace Influunt.Scheduler;
     public class JobSchedulerOptions
     {
         /// <summary>MongoDB connection string.</summary>
-        public string ConnectionString { get; set; } = "mongodb://localhost:27017/JobScheduler";
+        public string ConnectionString { get; set; } = "";
 
         /// <summary>Trigger scan interval (seconds).</summary>
         public int ScanIntervalSeconds { get; set; } = 60;

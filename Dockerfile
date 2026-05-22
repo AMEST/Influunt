@@ -17,6 +17,7 @@ RUN sed -i -e "s/<Version>0-develop<\/Version>/<Version>$(cat version | cut -c2-
     dotnet restore -s https://api.nuget.org/v3/index.json &&\
     dotnet build --no-restore -c Release &&\    
     dotnet publish ./src/Influunt.Host/Influunt.Host.csproj -c Release -o /app --no-build &&\
+    dotnet publish ./src/Influunt.Worker/Influunt.Worker.csproj -c Release -o /worker --no-build &&\
     dotnet nuget locals http-cache --clear &&\
     dotnet nuget locals temp --clear
 
@@ -28,3 +29,9 @@ WORKDIR /influunt
 EXPOSE 80
 ENV ASPNETCORE_URLS=http://*:80
 ENTRYPOINT ["dotnet", "Influunt.Host.dll"]
+
+######## Influunt worker
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim as worker
+COPY --from=build /worker /influunt
+WORKDIR /influunt
+ENTRYPOINT ["dotnet", "Influunt.Worker.dll"]

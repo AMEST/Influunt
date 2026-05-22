@@ -4,17 +4,20 @@ namespace Influunt.Scheduler.Tests;
 
 public class TestJobWithoutSettings : IJob
 {
+    public static int ExecutionCount = 0;
     public static bool WasExecuted { get; set; }
     
     public Task ExecuteAsync(CancellationToken cancellationToken)
     {
         WasExecuted = true;
+        Interlocked.Increment(ref ExecutionCount);
         return Task.CompletedTask;
     }
 }
 
 public class TestJobWithSettings : IJob<TestJobSettings>
 {
+    public static int ExecutionCount = 0;
     public static TestJobSettings? LastSettings { get; set; }
     public static bool WasExecuted { get; set; }
     
@@ -22,6 +25,7 @@ public class TestJobWithSettings : IJob<TestJobSettings>
     {
         LastSettings = settings;
         WasExecuted = true;
+        Interlocked.Increment(ref ExecutionCount);
         return Task.CompletedTask;
     }
 }

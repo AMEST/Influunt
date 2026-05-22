@@ -20,6 +20,20 @@
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/src/Influunt.Host/Views"
             }
+        },
+        {
+            "name": "Influunt.Worker",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-Influunt.Worker",
+            "program": "${workspaceFolder}/src/Influunt.Worker/bin/Debug/net8/Influunt.Worker.dll",
+            "args": [],
+            "env": {
+                "DOTNET_ENVIRONMENT": "Development"
+            },
+            "cwd": "${workspaceFolder}/src/Influunt.Worker",
+            "stopAtEntry": false,
+            "console": "internalConsole"
         }
     ]
 }

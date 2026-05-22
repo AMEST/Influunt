@@ -1,6 +1,8 @@
+using System;
 using Influunt.Feed.Crawler;
 using Influunt.Host;
 using Influunt.Host.Configurations;
+using Influunt.Scheduler;
 using Influunt.Storage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -13,10 +15,17 @@ using VueCliMiddleware;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOptions();
+Action<JobSchedulerOptions> schedulerConfigureAction = (c) =>
+{
+    builder.Configuration.GetSection("Scheduler").Bind(c);
+    c.ConnectionString = builder.Configuration.GetSection("ConnectionStrings:Mongo").GetValue<string>("ConnectionString");
+};
 builder.Services.Configure<CrawlerOptions>(builder.Configuration.GetSection("FeedCrawler"));
 var crawlerEnabled = builder.Configuration.GetSection("FeedCrawler:Enabled").Get<bool>();
 if (crawlerEnabled)
-    builder.Services.AddHostedService<FeedCrawlerBackgroundWorker>();
+    builder.Services.AddJobSchedulerHost(schedulerConfigureAction);
+else
+    builder.Services.AddJobScheduler(schedulerConfigureAction);
 
 builder.Services.AddSkidbladnirModules<StartupModule>(configuration =>
 {

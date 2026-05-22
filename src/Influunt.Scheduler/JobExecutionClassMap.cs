@@ -15,5 +15,7 @@ public class JobExecutionClassMap : BsonClassMap<JobExecution>
             .SetIdGenerator(StringObjectIdGenerator.Instance)
             .SetSerializer(new StringSerializer(BsonType.ObjectId));
         SetIgnoreExtraElements(true);
+        MapProperty(x => x.Id)
+            .SetIgnoreIfNull(true);
     }
 }

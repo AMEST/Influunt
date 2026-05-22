@@ -47,6 +47,7 @@ public class JobSchedulerIntegrationTests : SchedulerIntegrationTestBase
         var jobs = await scheduler.GetRegisteredJobsAsync();
         jobs.Should().ContainSingle();
         var job = jobs.First();
+        job.Id.Should().NotBeNullOrEmpty();
         job.Name.Should().Be("TestJobWithoutSettings");
         job.Description.Should().Be("Test job without settings");
         job.JobType.Should().Be(typeof(TestJobWithoutSettings).AssemblyQualifiedName);
@@ -66,6 +67,7 @@ public class JobSchedulerIntegrationTests : SchedulerIntegrationTestBase
         var jobs = await scheduler.GetRegisteredJobsAsync();
         jobs.Should().ContainSingle();
         var job = jobs.First();
+        job.Id.Should().NotBeNullOrEmpty();
         job.Name.Should().Be("TestJobWithSettings");
         job.Description.Should().Be("Test job with settings");
         job.JobType.Should().Be(typeof(TestJobWithSettings).AssemblyQualifiedName);
@@ -88,6 +90,7 @@ public class JobSchedulerIntegrationTests : SchedulerIntegrationTestBase
         var triggers = await scheduler.GetScheduledTriggersAsync();
         triggers.Should().ContainSingle();
         var trigger = triggers.First();
+        trigger.Id.Should().NotBeNullOrEmpty();
         trigger.TriggerId.Should().Be(triggerId);
         trigger.JobType.Should().Be(typeof(TestJobWithoutSettings).AssemblyQualifiedName);
         trigger.IsRecurring.Should().BeFalse();
@@ -118,6 +121,7 @@ public class JobSchedulerIntegrationTests : SchedulerIntegrationTestBase
         var triggers = await scheduler.GetScheduledTriggersAsync();
         triggers.Should().ContainSingle();
         var trigger = triggers.First();
+        trigger.Id.Should().NotBeNullOrEmpty();
         trigger.TriggerId.Should().Be(triggerId);
         trigger.JobType.Should().Be(typeof(TestJobWithoutSettings).AssemblyQualifiedName);
         trigger.IsRecurring.Should().BeTrue();
@@ -217,6 +221,7 @@ public class JobSchedulerIntegrationTests : SchedulerIntegrationTestBase
         await Task.Delay(TimeSpan.FromSeconds(4));
         
         TestJobWithoutSettings.WasExecuted.Should().BeTrue();
+        TestJobWithoutSettings.ExecutionCount.Should().Be(3);
         
         // All triggers should be removed after execution
         triggers = await scheduler.GetScheduledTriggersAsync();
