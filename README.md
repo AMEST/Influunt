@@ -54,8 +54,7 @@ Influunt use MongoDB as persistent data storage and Redis for faster distributed
 
 ### Feed
 
-* `FeedCrawler:Enabled` - enable background channels fetch (default: `true`). _In the future, can be disabled in api, and enabled in external worker_
-* `FeedCrawler:FetchInterval` - interval between fetching news from channels (default: `00:30:00` (30min))
+* `FeedCrawler:Enabled` - enable job host inside web host (default: `true`). _It may be disabled if you run Worker service_
 * `FeedCrawler:LastActivityDaysAgo` - Minimal user last activity date, for fetch news. If user don't use service more then n days, don't fetch news from user channel (default 93 days (~3 month))
 
 ## Screenshots
@@ -66,7 +65,7 @@ Influunt use MongoDB as persistent data storage and Redis for faster distributed
 
 ## Using in docker
 
-**Docker compose file for swarm mode:**
+**Docker compose file for swarm mode (with worker):**
 ```Dockerfile
 version: '3.8'
 
@@ -78,11 +77,23 @@ services:
       - "ConnectionStrings:Redis:ConnectionString=[Redis address]" # optional redis-based distributed cache connection
       - "Authentication:Google:ClientSecret=[GOOGLE CLIENT SECRET]"
       - "Authentication:Google:ClientId=[GOOGLE CLIENT ID]"
+      - "FeedCrawler:Enabled=false"
     ports:
      - target: 80
        published: 30002
        protocol: tcp
        mode: host
+    deploy:
+      replicas: 1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "3m"
+        max-file: "3"
+  host:
+    image: eluki/influunt-worker
+    environment:
+      - "ConnectionStrings:Mongo:ConnectionString=[MONGO DB CONNECTION STRING]"
     deploy:
       replicas: 1
     logging:

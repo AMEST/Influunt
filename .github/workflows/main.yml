@@ -14,23 +14,71 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  publish:
-    # The type of runner that the job will run on
+  publish-webhost:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-        # Runs a single command using the runners shell
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-    - name: Build And Push Influunt
-      uses: docker/build-push-action@v1.1.0
-      with:
-        repository: eluki/influunt
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        target: influunt
-        tag_with_ref: true
-        push: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/') }}
+    -   uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+    -   name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # list of Docker images to use as base name for tags
+          images: eluki/influunt
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=main,enable={{is_default_branch}}
+    -   name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+    -   name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+    -   name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+    -   name: Build and push Influunt Host
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: influunt
+          push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+  publish-worker:
+    runs-on: ubuntu-latest
+    steps:
+    -   uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+    -   name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # list of Docker images to use as base name for tags
+          images: eluki/influunt-worker
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=main,enable={{is_default_branch}}
+    -   name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+    -   name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+    -   name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+    -   name: Build and push Influunt Worker
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: influunt
+          push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Influunt.Host.ViewModels;
+using Influunt.Scheduler.Abstractions.Services;
+using Influunt.Feed.Entity;
+using Influunt.Feed.Crawler;
 
 namespace Influunt.Host.Controllers;
 
@@ -20,15 +23,18 @@ public class ChannelController : ControllerBase
     private readonly IUserService _userService;
     private readonly IChannelService _channelService;
     private readonly IFeedService _feedService;
+    private readonly IScheduler _scheduler;
 
     /// <inheritdoc />
     public ChannelController(IUserService userService,
         IChannelService channelService,
-        IFeedService feedService)
+        IFeedService feedService,
+        IScheduler scheduler)
     {
         _userService = userService;
         _channelService = channelService;
         _feedService = feedService;
+        _scheduler = scheduler;
     }
 
     /// <summary>
@@ -58,7 +64,7 @@ public class ChannelController : ControllerBase
         if (channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
             return channel.ToModel();
 
-        Response.StatusCode = (int) HttpStatusCode.Forbidden;
+        Response.StatusCode = (int)HttpStatusCode.Forbidden;
         return null;
     }
 
@@ -113,12 +119,25 @@ public class ChannelController : ControllerBase
     {
         var user = await _userService.GetCurrentUser();
         var channel = await _channelService.Get(id);
-         if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
+        if (!channel.UserId.Equals(user.Id, StringComparison.OrdinalIgnoreCase))
             return Forbid();
         await _channelService.Remove(user, channel);
 #pragma warning disable 4014
         _feedService.RemoveFeedByChannel(user, channel);
 #pragma warning restore 4014
         return Ok();
+    }
+
+    private async Task ScheduleFeedUpdateJob(User user)
+    {
+        var triggerId = $"user_{user.Id}_manual_feed_update";
+        await _scheduler.UnScheduleJobAsync(triggerId);
+        await _scheduler.ScheduleOneTimeJobAsync<UserFeedChannelUpdateJob, UserFeedChannelUpdateJobSettings>(
+            new UserFeedChannelUpdateJobSettings()
+            {
+                User = user
+            }, 
+            DateTime.UtcNow + TimeSpan.FromMinutes(10),
+            triggerId);
     }
 }

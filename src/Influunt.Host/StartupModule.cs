@@ -1,4 +1,5 @@
 ﻿using System;
+using Influunt.Feed.Extensions;
 using Influunt.Feed.Rss;
 using Influunt.Host.Configurations;
 using Influunt.Host.Services;
@@ -23,6 +24,7 @@ public class StartupModule : Module
             .PersistKeysToMongoDb(Configuration.AppConfiguration["ConnectionStrings:Mongo:ConnectionString"]);
         ConfigureDistributedCache(services);
         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+        services.AddFeedJobs();
     }
 
     private void ConfigureDistributedCache(IServiceCollection services)
