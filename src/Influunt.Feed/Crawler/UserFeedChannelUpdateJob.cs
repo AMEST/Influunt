@@ -59,7 +59,7 @@ public class UserFeedChannelUpdateJob : IJob<UserFeedChannelUpdateJobSettings>
             return;
         var remoteFeed = await remoteFeedProvider.GetRemoteFeed(channel);
         var count = await _feedService.TryAddToFeed(user, remoteFeed, channel);
-        _logger.LogInformation("Added {count} posts from channel {channelId}", user.Email, count, channel.Id);
+        _logger.LogInformation("Added {count} posts from channel {channelId} to {email} feed", count, channel.Id, user.Email);
     }
 
 }
